@@ -1,5 +1,4 @@
-Input files for benchmarking the FOP (LBO version). Used in the FPO
-paper.
+Input files used for the paper describing the implementation and benchmarking of the LBO collision operator in the Vlasov-Maxwell solver (VmLBO).
 
 Relaxation tests (Problem 1)
 
