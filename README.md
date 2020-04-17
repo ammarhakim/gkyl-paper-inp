@@ -2,7 +2,9 @@
 
 This repository contains input files and other supplimentary material from [Gkeyll](https://gkeyll.readthedocs.io/en/latest/) publications.
 
-The purpose of each folder in this repository in described below:
+**Note to authors:** please add another README.md file in each folder describing the input files (e.g. see 2020_JPP_VmLBO).
+
+The folders in this repository correspond to the following publications:
 - **2020_JPP_VmLBO**: Hakim, A., et. al. "Conservative Discontinuous Galerkin
   Schemes for Nonlinear Dougherty-Fokker-Planck Collision Operators" (submitted to Journal of Plasma Physics). 
 - **2020_NF_GkLBO**: Francisquez, M., et. al. "Conservative discontinuous Galerkin
