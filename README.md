@@ -9,3 +9,4 @@ The purpose of each folder in this repository in described below:
 - 2017_PoP_sheaths : Cagas, Petr, et al. "Continuum kinetic and multi-fluid simulations of classical sheaths." Physics of Plasmas 24.2 (2017): 022118.
 - 2017_PoP_Weibel: Cagas, Petr, et al. "Nonlinear saturation of the Weibel instability." Physics of Plasmas 24.11 (2017): 112116.
 - 2020_JCP_BCs: Cagas, Petr, Ammar Hakim, and Bhuvana Srinivasan. "Plasma-material boundary conditions for discontinuous Galerkin continuum-kinetic simulations, with a focus on secondary electron emission." Journal of Computational Physics 406 (2020): 109215.
+- 2020_JPP_EMGK: N. R. Mandell, A. Hakim, G. W. Hammett, M. Francisquez. "Electromagnetic full-f gyrokinetics in the tokamak edge with discontinuous Galerkin methods." Journal of Plasma Physics 86.1 (2020): 905860109
