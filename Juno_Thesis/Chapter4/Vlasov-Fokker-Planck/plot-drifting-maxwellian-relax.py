@@ -1,7 +1,7 @@
 from pylab import *
 import postgkyl
 
-style.use('postgkyl.mplstyle')
+style.use("postgkyl.mplstyle")
 
 def calcNormError(M):
     err = abs((M-M[0])/M[0])
@@ -57,43 +57,43 @@ X, V, f100 = getDist("r3/r3", 100)
 figure(1)
 pcolormesh(X, V, transpose(f0[0,:,:,0]))
 setp(gca(), aspect=1.0)
-xlabel('$V_X (V_{th})$')
-ylabel('$V_Y (V_{th})$')
-colorbar(format='%.2f', fraction=0.046, pad=0.04)
-savefig('drifting-maxwellian-dist-init.png', dpi=300)
+xlabel("$V_X (V_{th})$")
+ylabel("$V_Y (V_{th})$")
+colorbar(format="%.2f", fraction=0.046, pad=0.04)
+savefig("drifting-maxwellian-dist-init.png", dpi=300)
 
 figure(2)
 pcolormesh(X, V, transpose(f100[0,:,:,0]))
 setp(gca(), aspect=1.0)
-xlabel('$V_X (V_{th})$')
-ylabel('$V_Y (V_{th})$')
-colorbar(format='%.2f', fraction=0.046, pad=0.04)
-savefig('drifting-maxwellian-dist-final.png', dpi=300)
+xlabel("$V_X (V_{th})$")
+ylabel("$V_Y (V_{th})$")
+colorbar(format="%.2f", fraction=0.046, pad=0.04)
+savefig("drifting-maxwellian-dist-final.png", dpi=300)
 
 figure(3)
 # plot of energy and momentum error v/s time
 t, m2_err = calcEnergyError("r3/r3")
 t, m1i_0_err, m1i_1_err = calcMomentumError("r3/r3")
 
-semilogy(t, m2_err, 'b-', label='$\Delta M_2/M_2(0)$')
-semilogy(t, m1i_0_err, 'm-', label='$\Delta M_{1,x}/M_{1,x}(0)$')
-semilogy(t, m1i_1_err, 'r-', label='$\Delta M_{1,y}/M_{1,y}(0)$')
-legend(loc='best')
-xlabel(r'$t\nu$')
-ylabel(r'$|\Delta M|/M(0)$')
+semilogy(t, m2_err, "b-", label="$\Delta M_2/M_2(0)$")
+semilogy(t, m1i_0_err, "m-", label="$\Delta M_{1,x}/M_{1,x}(0)$")
+semilogy(t, m1i_1_err, "r-", label="$\Delta M_{1,y}/M_{1,y}(0)$")
+legend(loc="best")
+xlabel(r"$t\nu$")
+ylabel(r"$|\Delta M|/M(0)$")
 xlim(0,5)
 
-savefig('drifting-maxwellian-er.png', dpi=300)
+savefig("drifting-maxwellian-er.png", dpi=300)
 
 figure(4)
 T = linspace(0, 5, 100)
 s = getEntropy(2, "r3/r3")
-semilogx(T[1:], s[1:]/s[1]-1, '-b', label='$\Delta S/S(0)$')
-xlabel(r'$t\nu$')
-ylabel(r'$\Delta S/S(0)$')
+semilogx(T[1:], s[1:]/s[1]-1, "-b", label="$\Delta S/S(0)$")
+xlabel(r"$t\nu$")
+ylabel(r"$\Delta S/S(0)$")
 xlim([T[1], 5])
 ylim(0.0, 0.4)
 
-savefig('drifting-maxwellian-entropy.png', dpi=300)
+savefig("drifting-maxwellian-entropy.png", dpi=300)
 
 show()
