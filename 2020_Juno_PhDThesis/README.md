@@ -51,6 +51,10 @@ Chapter 4 (Benchmarks)
     - c32: p = 2, dx = 0.375 lambda_{D}, dv = 1/8 v_{th}, dt = 0.00625 omega_{pe}^{-1}
     - c33: p = 3, dx = 0.375 lambda_{D}, dv = 1/8 v_{th}, dt = 0.00625 omega_{pe}^{-1}
   - Advection in Specified Electromagnetic Fields
+    - a1: non-resonant solution, p = 2
+    - a2: resonant solution, p = 2
+    - a3: same as a1, but run for 1000 Omega_{c}^{-1}
+    - a4: same as a3, but with p = 3
   - Landau Damping of Langmuir Waves
   - Three-Species Collisionless Shock
   - Lower Hybrid Drift Instability
