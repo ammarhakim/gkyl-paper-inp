@@ -49,7 +49,7 @@ def plotFig(nr,nc,i,fr,showX=False,showY=False,showColorBar=False):
     if showY:
         ylabel(r"$v_y (v_{th})$")
     if showColorBar:
-        colorbar(format='%.2f', ticks=np.linspace(0.0, 0.16, 5), fraction=0.046, pad=0.04)
+        colorbar(format='%.2f', ticks=linspace(0.0, 0.16, 5), fraction=0.046, pad=0.04)
         clim(0.0, 0.16)
     # Make aspect ratio equal.
     setp(f, aspect=1.0)
