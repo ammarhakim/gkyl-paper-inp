@@ -13,8 +13,10 @@ The folders in this repository correspond to the following publications:
 - **2020_JPP_VmLBO**: A. Hakim, et al. "Conservative Discontinuous Galerkin
   Schemes for Nonlinear Dougherty-Fokker-Planck Collision Operators" (in-press Journal of Plasma Physics). 
 - **2020_Juno_PhDThesis**: J. Juno. "A Deep Dive into the Distribution Function: Understanding Phase Space Dynamics with Continuum Vlasov-Maxwell Simulations" [arXiv:2005.13539](arxiv.org/abs/2005.13539). Ph.D Thesis, University of Maryland, MD. 2020
+- **2020_PoP_HelimakBias**: Bernard, T. N., et al. "Investigating shear flow through continuum gyrokinetic simulations of limiter biasing in the Texas Helimak." Physics of Plasmas, 27.6 (2020): 062304.
 - **2020_JPP_EMGK**: N. R. Mandell, et al. "Electromagnetic full-f gyrokinetics in the tokamak edge with discontinuous Galerkin methods." Journal of Plasma Physics 86.1 (2020): 905860109
 - **2020_JCP_BCs**: P. Cagas, A. Hakim, and B. Srinivasan. "Plasma-material boundary conditions for discontinuous Galerkin continuum-kinetic simulations, with a focus on secondary electron emission." Journal of Computational Physics 406 (2020): 109215.
+- **2019_PoP_Helimak**: T. Bernard, et al. "Gyrokinetic continuum simulations of plasma turbulence in the Texas Helimak." Physics of Plasmas 26.4 (2019): 042301.
 - **2017_PoP_sheaths**: P. Cagas, et al. "Continuum kinetic and multi-fluid simulations of classical sheaths." Physics of Plasmas 24.2 (2017): 022118.
 - **2017_PoP_Weibel**: P. Cagas, et al. "Nonlinear saturation of the Weibel instability." Physics of Plasmas 24.11 (2017): 112116.
 
