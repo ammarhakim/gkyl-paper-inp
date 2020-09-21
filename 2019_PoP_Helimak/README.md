@@ -1,0 +1,1 @@
+Input file to reproduce the Helimak simulation in the paper. Note that the data in the paper was produced from a simulation run using the first version of Gkeyll. This input file has been adapted from the orginal file in order to run using the current version of Gkeyll. Therefore, results of this input file may deviate slightly from those in the paper.
