@@ -41,7 +41,7 @@ lambda_nSource = 0.01 -- [m], characteristic length scale of density
 P_src = 150           -- [W], source is scaled to input power
 
 -- limiter biasing parameters
-V_bias = -40   -- [V]
+V_bias = 10   -- [V]
 xL_bias = 0.86 -- [m]
 xR_bias = 1.06 -- [m]
 
@@ -76,7 +76,7 @@ plasmaApp = Plasma.App {
    nFrame = 1600,                        -- number of output frames
    lower = {R0 - Lx/2, -Ly/2, -Lz/2},    -- configuration space lower left
    upper = {R0 + Lx/2, Ly/2, Lz/2},      -- configuration space upper right
-   cells = {16, 1, 8},  --{48, 24, 16},                 -- configuration space cells
+   cells = {48, 24, 16},                 -- configuration space cells
    basis = "serendipity",                -- one of "serendipity" or "maximal-order"
    polyOrder = 1,                        -- polynomial order
    timeStepper = "rk3",                  -- one of "rk2" or "rk3"
@@ -84,7 +84,7 @@ plasmaApp = Plasma.App {
    restartFrameEvery = 0.01,
 
    -- decomposition for configuration space
-   decompCuts = {4, 1, 1},  -- {8, 8, 4},               -- cuts in each configuration direction
+   decompCuts = {8, 8, 4},               -- cuts in each configuration direction
    useShared = false,                    -- shared memory is off
 
    -- boundary conditions for configuration space
@@ -228,6 +228,15 @@ plasmaApp = Plasma.App {
          return B0*R0/x
       end,
 
+      phiWall = function(t, xn)
+      	 local x = xn[1]
+      	 if x >= xL_bias and x <= xR_bias then
+      	    return V_bias
+      	 else
+      	    return 0
+      	 end
+      end,
+	    
       -- geometry is not time-dependent
       evolve = false,
    },
