@@ -2,6 +2,8 @@
 
 This repository contains input files and other supplimentary material from [Gkeyll](https://gkeyll.readthedocs.io/en/latest/) publications.
 
+**Note to users:** some changes disrupted backwards compatibility with input files in this repository. See updateInputFiles.md for a list of changes you may need to make to run the input file with the latest version of Gkeyll.
+
 **Note to authors:** please add another README.md file in each folder describing the input files (e.g. see 2020_JPP_VmLBO).
 
 The folders in this repository correspond to the following publications:
