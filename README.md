@@ -8,6 +8,7 @@ This repository contains input files and other supplimentary material from [Gkey
 
 The folders in this repository correspond to the following publications:
 
+- **2021_PoP_GK_Fluid_PINN**: A. Mathews, et al. "Turbulent field fluctuations in gyrokinetic and fluid plasmas." Physics of Plasmas (2021).
 - **2020_PRL_dynamo**: I. Pusztai, et al. "Dynamo in Weakly Collisional
   Nonmagnetized Plasmas Impeded." Physical Review Letters (2020).
 - **2020_NF_GkLBO**: M. Francisquez, et al. "Conservative discontinuous Galerkin
