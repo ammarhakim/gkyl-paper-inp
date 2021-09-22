@@ -1,6 +1,7 @@
 2021 DG interpolation and sheared (twist-shift) BCs JCP paper
 
 Input files used to generate the results presented in section 4.
+The results for this publication were produced with revision [223c785](https://github.com/ammarhakim/gkyl/commit/223c7856f3fbf97787c768a62c115363362785f2) of the gkyl code.
 
 1. tests-2d:
   - twistShift-2x-yGaussian: shifts a y-Gaussian forward and backward.
