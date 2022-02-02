@@ -63,7 +63,7 @@ sim = Plasma.App {
    timeStepper = "rk3",            -- One of "rk2" or "rk3".
 
    -- Decomposition for configuration space.
-   decompCuts = {56},   -- Cuts in each configuration direction.
+   decompCuts = {4},   -- Cuts in each configuration direction.
    useShared  = false,  -- If to use shared memory.
 
    -- Boundary conditions for configuration space.
@@ -84,7 +84,11 @@ sim = Plasma.App {
 	 end,
          driftSpeed = function (t, xn)
             local x, vpar = xn[1], xn[2]
-	    return cs*x/(Lx/2)
+	    if x <= 0 then
+	       return -cs
+	    else
+	       return cs
+	    end
          end,
          temperature = function (t, xn)
             local x, vpar = xn[1], xn[2]
@@ -113,7 +117,11 @@ sim = Plasma.App {
 	 end,
          driftSpeed = function (t, xn)
             local x, vpar = xn[1], xn[2] 
-	    return cs*x/(Lx/2)
+	    if x <= 0 then
+	       return -cs
+	    else
+	       return cs
+	    end
          end,
          temperature = function (t, xn)
             local x, vpar = xn[1], xn[2]
@@ -130,6 +138,7 @@ sim = Plasma.App {
       	 neutMass = mi,
       	 plasma = "H",
       	 charge = qi,
+	 vSigmaCX = 2.2e-14,
       },
       -- Diagnostics
       diagnosticMoments = { "GkM0", "GkM1", "GkM2", "GkUpar", "GkVtSq"},
@@ -140,9 +149,9 @@ sim = Plasma.App {
    neut = Plasma.Vlasov {
       charge = 0.0, mass = mi,
       -- Velocity space grid
-      lower = {-4.0*vti},-- -4.0*vti, -4.0*vti},
-      upper = {4.0*vti},--[ 4.0*vti, 4.0*vti},
-      cells = {32},-- 32, 32},
+      lower = {-4.0*vti},
+      upper = {4.0*vti},
+      cells = {32},
       decompCuts = {1},
       init = Plasma.VmMaxwellianProjection {
          density = function (t, xn)
@@ -172,7 +181,7 @@ sim = Plasma.App {
       recycleTemp = 2*eV,
       recycleFrac = 1.0,
       recycleSpeed = cs,
-      recycleFluxFac = 4.055387965373188e18,
+      recycleFluxFac = 4.977492882411091e18,
       recycleIon = "ion",
       -- Neutral interactions
       chargeExchange = Plasma.ChargeExchange {
@@ -183,6 +192,7 @@ sim = Plasma.App {
       	 neutMass = mi,
       	 plasma = "H",
       	 charge = 0,
+	 vSigmaCX = 2.2e-14,
       },
       -- Diagnostics
       diagnosticMoments = { "M0", "u", "vtSq"},

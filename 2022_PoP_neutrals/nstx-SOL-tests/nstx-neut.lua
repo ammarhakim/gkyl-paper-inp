@@ -1,7 +1,7 @@
 -- Gkyl --------------------------------------------------------------
 -- Basic sheath simulation -------------------------------------------
--- NSTX SOL test in 1x3v without neutral species.
--- Run using Gkyl changeset [416865089be6].
+-- NSTX SOL test in 3x2v with 3x3v neutral species.
+-- Run using Gkyl changeset [8a2b6a47522b].
 ----------------------------------------------------------------------
 
 local Plasma = (require "App.PlasmaOnCartGrid").Gyrokinetic()
