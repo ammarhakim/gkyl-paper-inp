@@ -2,7 +2,7 @@
 -- Basic sheath simulation -------------------------------------------
 -- Benchmark test for comparison with DEGAS2 in 1x3v with static
 -- plasma. Includes charge exchange and wall recycling.
--- Run using Gkyl changeset [d2c5faba64ab].
+-- Run using Gkyl changeset [c8b24bb98c25].
 ----------------------------------------------------------------------
 
 local Plasma = (require "App.PlasmaOnCartGrid").Gyrokinetic()

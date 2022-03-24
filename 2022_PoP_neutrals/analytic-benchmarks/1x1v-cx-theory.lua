@@ -1,7 +1,7 @@
 -- Gkyl ----------------------------------------------------------------
 -- Basic sheath simulation ---------------------------------------------
 -- To test neutral model in 1x1v with static plasma and charge exchange.
--- Results produced with Gkeyll changeset [d9eafc9f1234].
+-- Results produced with Gkeyll changeset [c8b24bb98c25].
 ------------------------------------------------------------------------
 
 local Plasma = (require "App.PlasmaOnCartGrid").Gyrokinetic()
