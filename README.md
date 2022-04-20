@@ -11,14 +11,14 @@ The folders in this repository correspond to the following publications:
 - **2022_PoP_neutrals**: T. N. Bernard, et al. "Kinetic modeling of neutral
   transport for a continuum gyrokinetic code". Submmitted to Physics of Plasmas.
 - **2022_PoP_EMGK_broadening**: N. R. Mandell, et al. "Turbulent
-  broadening of electron heat-flux width in electromagnetic gyrokinetic simulations of a helical scrape-off layer model". Submitted to Nuclear Fusion.
+  broadening of electron heat-flux width in electromagnetic gyrokinetic simulations of a helical scrape-off layer model". Physics of Plasmas 29 (2022): 042504.
 - **2022_PRE_RayleighTaylor**: J. Rodman, et al. "Kinetic simulations of
   the Rayleigh-Taylor instability". Submitted to Physical Review E. 
 - **2022_PRE_OscBunemanIA**: S. Marlhom, et al. "Current-driven Langmuir
   Oscillations and Streaming Instabilities". Submitted to Physical Review E.
-- **2022_JPP_EMGK_shear**: N. R. Mandell, et al. "Reduction of transport due to
-  magnetic shear in gyrokinetic simulations of the scrape-off layer". Submitted to Plasma Physics and Controlled fusion. 
-- **2021_PoP_GK_Fluid_PINN**: A. Mathews, et al. "Turbulent field fluctuations in gyrokinetic and fluid plasmas." Physics of Plasmas (2021).
+- **2022_PPCF_EMGK_shear**: N. R. Mandell, et al. "Reduction of transport due to
+  magnetic shear in gyrokinetic simulations of the scrape-off layer". Submitted to Plasma Physics and Controlled Fusion. 
+- **2021_PoP_GK_Fluid_PINN**: A. Mathews, et al. "Turbulent field fluctuations in gyrokinetic and fluid plasmas." Physics of Plasmas 28 (2021): 112301.
 - **2020_PRL_dynamo**: I. Pusztai, et al. "Dynamo in Weakly Collisional
   Nonmagnetized Plasmas Impeded." Physical Review Letters (2020).
 - **2020_NF_GkLBO**: M. Francisquez, et al. "Conservative discontinuous Galerkin
