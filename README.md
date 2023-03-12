@@ -8,12 +8,16 @@ This repository contains input files and other supplimentary material from [Gkey
 
 The folders in this repository correspond to the following publications:
 
+- **2023_PoP_gkwham1x2v**: M. Francisquez, et al. "Towards continuum
+  gyrokinetic study of high-field mirrors". Submitted to Physics of Plasmas.
+- **2023_CPC_TwistShift**: M. Francisquez, et al. "Conservative discontinuous
+  Galerkin interpolation: sheared boundary conditions". Submitted to Computer Physics Communications.
 - **2022_PoP_neutrals**: T. N. Bernard, et al. "Kinetic modeling of neutral
-  transport for a continuum gyrokinetic code". Submmitted to Physics of Plasmas.
+  transport for a continuum gyrokinetic code". Phys. Plasmas 29, 052501 (2022).
 - **2022_PoP_EMGK_broadening**: N. R. Mandell, et al. "Turbulent
   broadening of electron heat-flux width in electromagnetic gyrokinetic simulations of a helical scrape-off layer model". Physics of Plasmas 29 (2022): 042504.
 - **2022_PRE_RayleighTaylor**: J. Rodman, et al. "Kinetic simulations of
-  the Rayleigh-Taylor instability". Submitted to Physical Review E. 
+  the Rayleigh-Taylor instability". Phys. Rev. E 105, 065209 (2022). 
 - **2022_PRE_OscBunemanIA**: S. Marlhom, et al. "Current-driven Langmuir
   Oscillations and Streaming Instabilities". Submitted to Physical Review E.
 - **2022_PPCF_EMGK_shear**: N. R. Mandell, et al. "Reduction of transport due to
