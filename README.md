@@ -12,7 +12,7 @@ The folders in this repository correspond to the following publications:
   gyrokinetic study of high-field mirrors". Submitted to Physics of Plasmas.
 - **2023_CPC_TwistShift**: M. Francisquez, et al. "Conservative discontinuous
   Galerkin interpolation: sheared boundary conditions". Submitted to Computer Physics Communications.
-  **2022_PoP_BiasedWallSheaths**: C. R. Skolar, et al. "Continuum kinetic investigation of the impact of bias potentials in the current saturation regime on sheath formation". Physics of Plasmas 30, 012504 (2023)
+- **2022_PoP_BiasedWallSheaths**: C. R. Skolar, et al. "Continuum kinetic investigation of the impact of bias potentials in the current saturation regime on sheath formation". Physics of Plasmas 30, 012504 (2023)
 - **2022_PoP_neutrals**: T. N. Bernard, et al. "Kinetic modeling of neutral
   transport for a continuum gyrokinetic code". Phys. Plasmas 29, 052501 (2022).
 - **2022_PoP_EMGK_broadening**: N. R. Mandell, et al. "Turbulent
