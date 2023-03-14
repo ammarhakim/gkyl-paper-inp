@@ -12,6 +12,7 @@ The folders in this repository correspond to the following publications:
   gyrokinetic study of high-field mirrors". Submitted to Physics of Plasmas.
 - **2023_CPC_TwistShift**: M. Francisquez, et al. "Conservative discontinuous
   Galerkin interpolation: sheared boundary conditions". Submitted to Computer Physics Communications.
+- **2023_jets**: P. Cagas, et al. "An investigation of shock formation versus shock mitigation of colliding plasma jets". Submitted to Physics of Plasmas
 - **2023_ApJ_ObliqueShock**: J. Juno, et al. "Phase-space Energization of Ions in Oblique Shocks." Astrophysical Journal 944.15 (2023).
 - **2022_PoP_BiasedWallSheaths**: C. R. Skolar, et al. "Continuum kinetic investigation of the impact of bias potentials in the current saturation regime on sheath formation". Physics of Plasmas 30, 012504 (2023)
 - **2022_PoP_neutrals**: T. N. Bernard, et al. "Kinetic modeling of neutral
