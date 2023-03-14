@@ -12,6 +12,7 @@ The folders in this repository correspond to the following publications:
   gyrokinetic study of high-field mirrors". Submitted to Physics of Plasmas.
 - **2023_CPC_TwistShift**: M. Francisquez, et al. "Conservative discontinuous
   Galerkin interpolation: sheared boundary conditions". Submitted to Computer Physics Communications.
+- **2023_ApJ_ObliqueShock**: J. Juno, et al. "Phase-space Energization of Ions in Oblique Shocks." Astrophysical Journal 944.15 (2023).
 - **2022_PoP_BiasedWallSheaths**: C. R. Skolar, et al. "Continuum kinetic investigation of the impact of bias potentials in the current saturation regime on sheath formation". Physics of Plasmas 30, 012504 (2023)
 - **2022_PoP_neutrals**: T. N. Bernard, et al. "Kinetic modeling of neutral
   transport for a continuum gyrokinetic code". Phys. Plasmas 29, 052501 (2022).
@@ -23,6 +24,8 @@ The folders in this repository correspond to the following publications:
   Oscillations and Streaming Instabilities". Submitted to Physical Review E.
 - **2022_PPCF_EMGK_shear**: N. R. Mandell, et al. "Reduction of transport due to
   magnetic shear in gyrokinetic simulations of the scrape-off layer". 2022 Plasma Phys. Control. Fusion 64 085006 
+- **2021__JPP_FPC_Perp_Shock**: J. Juno, et al. "A field–particle correlation analysis of a perpendicular magnetized collisionless shock." 
+  Journal of Plasma Physics 87.3 (2021): 905870316.
 - **2021_PoP_GK_Fluid_PINN**: A. Mathews, et al. "Turbulent field fluctuations in gyrokinetic and fluid plasmas." Physics of Plasmas 28 (2021): 112301.
 - **2020_PRL_dynamo**: I. Pusztai, et al. "Dynamo in Weakly Collisional
   Nonmagnetized Plasmas Impeded." Physical Review Letters (2020).
