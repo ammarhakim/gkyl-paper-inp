@@ -29,8 +29,9 @@ The folders in this repository correspond to the following publications:
 - **2022_PRE_OscBunemanIA**: S. Marlhom, et al. "Current-driven Langmuir
   Oscillations and Streaming Instabilities". Submitted to Physical Review E.
 - **2022_PPCF_EMGK_shear**: N. R. Mandell, et al. "Reduction of transport due to
-  magnetic shear in gyrokinetic simulations of the scrape-off layer". 2022 Plasma Phys. Control. Fusion 64 085006 
-- **2021__JPP_FPC_Perp_Shock**: J. Juno, et al. "A field–particle correlation analysis of a perpendicular magnetized collisionless shock." 
+  magnetic shear in gyrokinetic simulations of the scrape-off layer". 2022 Plasma Phys. Control. Fusion 64 085006
+- **2021_Frontiers_Reconstruction**: T. Broeren, et al "Magnetic Field Reconstruction for a Realistic Multi-Point, Multi-Scale Spacecraft Observatory." Frontiers in Astronomy and Space Sciences, 8, 144, (2021). 
+- **2021_JPP_FPC_Perp_Shock**: J. Juno, et al. "A field–particle correlation analysis of a perpendicular magnetized collisionless shock." 
   Journal of Plasma Physics 87.3 (2021): 905870316.
 - **2021_PoP_GK_Fluid_PINN**: A. Mathews, et al. "Turbulent field fluctuations in gyrokinetic and fluid plasmas." Physics of Plasmas 28 (2021): 112301.
 - **2020_PRL_dynamo**: I. Pusztai, et al. "Dynamo in Weakly Collisional
