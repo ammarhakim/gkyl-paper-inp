@@ -7,7 +7,8 @@ This repository contains input files and other supplimentary material from [Gkey
 **Note to authors:** please add another README.md file in each folder describing the input files (e.g. see 2020_JPP_VmLBO).
 
 The folders in this repository correspond to the following publications:
-
+- **2023_PoP_Reconnection**: J. TenBarge, et al. "Electron Energization in Reconnection: Eulerian versus Lagrangian Perspectives". Submitted to Physics of Plasmas
+- **2023_ESS_Reconstruction**: T. Broeren, et al. "Multi-Spacecraft Magnetic Field Reconstructions: A Cross-Scale Comparison of Methods". Submitted to Earth and Space Science
 - **2023_PRX_iat**: Z. Liu, et al. "A Two-dimensional Numerical Study of
   Ion-Acoustic Turbulence". Submitted to Physical Review X.
 - **2023_PoP_neutral_blobs**: T. N. Bernard, et al. "Effect of neutral
