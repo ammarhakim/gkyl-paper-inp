@@ -182,7 +182,7 @@ plasmaApp = Plasma.App {
    nFrame      = 500,                     -- Number of output frames.
    lower       = {R - Lx/2-.02, -Ly/2, -Lz/2}, -- Configuration space lower left.
    upper       = {R + Lx/2, Ly/2, Lz/2},   -- Configuration space upper right.
-   cells       = {16, 32, 32},              -- Configuration space cells.
+   cells       = {30, 64, 32},              -- Configuration space cells.
    basis       = "serendipity",            -- One of "serendipity" or "maximal-order".
    polyOrder   = 1,                        -- Polynomial order.
    timeStepper = "rk3",                    -- One of "rk2" or "rk3".
@@ -192,7 +192,7 @@ plasmaApp = Plasma.App {
    groupDiagnostics = true,
    
    -- Decomposition for configuration space.
-   decompCuts = {8, 8, 8}, -- Cuts in each configuration direction.
+   decompCuts = {6, 16, 8}, -- Cuts in each configuration direction.
    useShared = false,      -- If to use shared memory.
 
    -- Boundary conditions for configuration space.
