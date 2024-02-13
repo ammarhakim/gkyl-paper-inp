@@ -8,7 +8,7 @@ This repository contains input files and other supplimentary material from [Gkey
 
 The folders in this repository correspond to the following publications:
 - **2023_PSST_ModelSEE**: K. Bradshaw and B. Srinivasan. "Energy-dependent implementation of secondary electron emission models in continuum kinetic sheath simulations". Submitted to Plasma Sources Science and Technology
-- **2023_PoP_Reconnection**: J. TenBarge, et al. "Electron Energization in Reconnection: Eulerian versus Lagrangian Perspectives". Submitted to Physics of Plasmas
+- **2023_PoP_Reconnection**: J. TenBarge, et al. "Electron Energization in Reconnection: Eulerian versus Lagrangian Perspectives". Phys. Plasmas 31, 022901 (2024) https://doi.org/10.1063/5.0184710
 - **2023_ESS_Reconstruction**: T. Broeren, et al. "Multi-Spacecraft Magnetic Field Reconstructions: A Cross-Scale Comparison of Methods". Submitted to Earth and Space Science
 - **2023_PRX_iat**: Z. Liu, et al. "A Two-dimensional Numerical Study of
   Ion-Acoustic Turbulence". Submitted to Physical Review X.
