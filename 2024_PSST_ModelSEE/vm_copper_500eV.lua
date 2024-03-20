@@ -1,7 +1,5 @@
 -- Gkyl --------------------------------------------------------------
--- Low emission (T_e = 20eV) 1X1V sheath simulation with boundary ----
--- condition determined by Furman-Pivi model with copper fitting -----
--- parameters. LBO collisions and particle source are present. -------
+-- 1X1V copper emitting wall sheath simulation -----------------------
 local Plasma = require("App.PlasmaOnCartGrid").VlasovMaxwell()
 
 -- SI units
@@ -10,7 +8,7 @@ local q0 = 1.6021766e-19
 local q_e, q_i = -q0, q0
 local m_e, m_i = 9.109383e-31, 1.6726218e-27
 local n_e, n_i = 1.0e17, 1.0e17
-local T_e, T_i = 20.0*q0, 2.0*q0
+local T_e, T_i = 500.0*q0, 500.0*q0
 
 -- plasma parameters
 local vth_e, vth_i = math.sqrt(T_e/m_e), math.sqrt(T_i/m_i)
@@ -23,11 +21,29 @@ local c = 6.0*vth_e
 local mu_0 = 1.0/(epsilon_0*c^2)
 
 -- collision frequencies
-local mfp = 50*lambda_D
+local mfp = 500*lambda_D
 local nu_ee = vth_e/mfp
 local nu_ei = nu_ee
 local nu_ii = vth_i/mfp
 local nu_ie = (m_e/m_i)*nu_ee
+
+-- collision frequency profiles
+local function nu_eeProfile(t, xn)
+   local x = xn[1]
+   return nu_ee/(1 + math.exp(math.abs(x)/(6*lambda_D) - 8/1.5))
+end
+local function nu_eiProfile(t, xn)
+   local x = xn[1]
+   return nu_ei/(1 + math.exp(math.abs(x)/(6*lambda_D) - 8/1.5))
+end
+local function nu_iiProfile(t, xn)
+   local x = xn[1]
+   return nu_ii/(1 + math.exp(math.abs(x)/(6*lambda_D) - 8/1.5))
+end
+local function nu_ieProfile(t, xn)
+   local x = xn[1]
+   return nu_ie/(1 + math.exp(math.abs(x)/(6*lambda_D) - 8/1.5))
+end
 
 -- length of source region
 local sourceLength = 40.0*lambda_D
@@ -49,7 +65,6 @@ sim = Plasma.App {
 
    basis = "serendipity", -- one of "serendipity" or "maximal-order"
    polyOrder = 2, -- polynomial order
-   --cflFrac = 1.0, -- CFL "fraction". Usually 1.0
    timeStepper = "rk3s4", -- one of "rk2" or "rk3"
 
    -- decomposition for configuration space
@@ -84,7 +99,7 @@ sim = Plasma.App {
             local x, vx = xn[1], xn[2]
             local m = maxwellian(1.0, 0.0, vth_e, vx)
             if math.abs(x) < sourceLength then
-               return (sourceLength - math.abs(x))/sourceLength*m
+               return 2*(sourceLength - math.abs(x))/sourceLength*m
             else
                return 0.0
             end
@@ -122,7 +137,7 @@ sim = Plasma.App {
             local x, vx = xn[1], xn[2]
             local m = maxwellian(1.0, 0.0, vth_i, vx)
             if math.abs(x) < sourceLength then
-               return (sourceLength - math.abs(x))/sourceLength*m
+               return 2*(sourceLength - math.abs(x))/sourceLength*m
             else
                return 0.0
             end
