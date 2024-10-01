@@ -1,11 +1,9 @@
 -- Gkyl ------------------------------------------------------------------------
 --
 -- An 3x2v open field line simulation with Miller geometry using
--- parameters similar to those near the LCFS of LTX's shot 103795
--- at t=469.11 ms.
+-- parameters similar to those near the LCFS of DIII-D IWL shots
 --
--- The plasma parameters are taken from Elizabeth Perez's old Li simulation.
--- ~/gkylsoft/openmpi/bin/mpirun -n 4 ~/gkylsoft/gkyl/bin/gkyl *lua
+-- Simulation used gkyl changeset 0754a79b380f.
 --
 --------------------------------------------------------------------------------
 local Plasma    = (require "App.PlasmaOnCartGrid").Gyrokinetic()
@@ -31,32 +29,28 @@ me, mp   = Constants.ELECTRON_MASS, Constants.PROTON_MASS
 -- Plasma parameters. 
 AMU = 2.01410177811
 mi  = mp*AMU  -- Deuterium ions.
-Te0 = 40*eV 
-Ti0 = 40*eV 
-n0  = 7.0e18     -- [1/m^3]
+Te0 = 40*eV   -- [J]
+Ti0 = 40*eV   -- [J]
+n0  = 7.0e18  -- [1/m^3]
 
 -- Geometry and magnetic field.
---R_axisTrue = 0.388252435        -- [m]
 Rdim       = 1.7  -- [m]
 Zdim       = 3.2  -- [m]
 Z_axis     = 0.013055028 -- [m]
---R_axisTrue = 1.6486461 --0.95*R_axisTrue    -- Change R_axis to fit geometry better.
-R_axis     = 1.65
-B_axis     = 2 --*R_axisTrue/R_axis   -- [T]
-R_LCFSmid  = 2.17 --2.17885               -- Major radius of the LCFS at the outboard midplane [m].
+R_axis     = 1.65 -- [m]
+B_axis     = 2 -- [T]
+R_LCFSmid  = 2.17               -- Major radius of the LCFS at the outboard midplane [m].
 Rmid_min   = R_LCFSmid          -- Minimum midplane major radius of simulation box [m].
-Rmid_max   = 2.35 --2.32               -- Maximum midplane major radius of simulation box [m].
+Rmid_max   = 2.35               -- Maximum midplane major radius of simulation box [m].
 R0         = 0.5*(Rmid_min+Rmid_max)  -- Major radius of the simulation box [m].
 a_mid      = R_LCFSmid-R_axis   -- Minor radius at outboard midplane [m].
 r0         = R0-R_axis          -- Minor radius of the simulation box [m].
 B0         = B_axis*(R_axis/R0) -- Magnetic field magnitude in the simulation box [T].
 
--- What are these values??
 qAxis      = 0.7
 qSep       = 3.0              -- Safety factor at the separatrix.
---sSep       = 1.27976219        -- Magnetic shear at the separatrix.
-kappa      = 1.0 -- 1.33              -- Elongation (=1 for no elongation).
-delta      = 0.0 --0.4             -- Triangularity (=0 for no triangularity).
+kappa      = 1.0              -- Elongation (=1 for no elongation).
+delta      = 0.04             -- Triangularity (=0 for no triangularity).
 
 function r_x(x) return x+a_mid end   -- Minor radius given x.
 function qprofile(r) return qAxis + (qSep - qAxis)*(r/a_mid)^2 end   -- Magnetic safety profile.
@@ -167,11 +161,11 @@ end
 plasmaApp = Plasma.App {
    logToFile = true,
 
-   tEnd   = 10e-6, --1000/omega_ci,                 -- End time.
+   tEnd   = 10e-6,                -- End time.
    nFrame = 100,                  -- Number of output frames.
-   lower  = {xMin,-Ly/2,-Lz/2},                  -- Configuration space lower left.
-   upper  = {xMax, Ly/2,Lz/2},                  -- Configuration space upper right.
-   cells  = {72, 72, 16},                     -- Configuration space cells.
+   lower  = {xMin,-Ly/2,-Lz/2},   -- Configuration space lower left.
+   upper  = {xMax, Ly/2,Lz/2},    -- Configuration space upper right.
+   cells  = {72, 72, 16},         -- Configuration space cells.
    mapc2p = function(xc)                   -- Transformation from computational to physical coordinates.
       local x, y, z = xc[1], xc[2], xc[3]
       local r = r_x(x)
