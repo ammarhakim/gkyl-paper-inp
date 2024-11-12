@@ -7,6 +7,7 @@ This repository contains input files and other supplimentary material from [Gkey
 **Note to authors:** please add another README.md file in each folder describing the input files (e.g. see 2020_JPP_VmLBO).
 
 The folders in this repository correspond to the following publications:
+- **2024_NF_ImpTransport**: Zamperini, S. A., Bernard, T. A., Rudakov, D. L. & Boedo, J. A. "Turbulent drifts of impurity ions as an explanation for anomalous radial transport in the far-SOL of DIII-D". Nucl. Fusion 64, 074002 (2024) https://dx.doi.org/10.1088/1741-4326/ad4c78
 - **2024_ApJ_LAPDReflection**: S. Bose, J. TenBarge, et al. "Experimental study of Alfvén wave reflection from an Alfvén-speed gradient relevant to the solar coronal holes." Submitted to ApJ
 - **2024_PSST_ModelSEE**: K. Bradshaw and B. Srinivasan. "Energy-dependent implementation of secondary electron emission models in continuum kinetic sheath simulations". Submitted to Plasma Sources Science and Technology
 - **2023_PoP_Reconnection**: J. TenBarge, et al. "Electron Energization in Reconnection: Eulerian versus Lagrangian Perspectives". Phys. Plasmas 31, 022901 (2024) https://doi.org/10.1063/5.0184710
