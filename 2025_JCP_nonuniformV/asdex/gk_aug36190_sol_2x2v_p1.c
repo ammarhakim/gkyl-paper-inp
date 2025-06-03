@@ -326,7 +326,7 @@ double main_chamber_parallel_mask(double z, void *ctx)
   struct gk_asdex_ctx *app = ctx;
   double z_xpt_psi_min_lo = app->z_xpt_psi_min_lo;
 
-  double mu = z_xpt_psi_min_lo/2.0;
+  double mu = 0.0; //z_xpt_psi_min_lo/2.0;
   double sig = 2.6;
   int p = 24;
   double floor = 0.001;
@@ -532,15 +532,15 @@ create_ctx(void)
   printf("  psi_max = %.13e\n",psi_max);
 
   // Source parameters.
-  double psi_src = psi_rho(1.01, psi_axis, psi_sep);
+  double psi_src = psi_rho(rho_min, psi_axis, psi_sep);
   double Lc_src = 67.0; // Connection length where source is localized.
   double lambda_src = 0.14*Lx;
-  double ndot_src = 2.0*0.7e19*c_s/(Lc_src/4.0);
-  double Te_src = 1.5*Te;
-  double Ti_src = 1.5*Ti;
+  double ndot_src = sqrt(1.25*1.4*1.6)*2.0*0.7e19*c_s/(Lc_src/4.0);
+  double Te_src = 1.25*1.3*1.4*1.6*1.5*Te;
+  double Ti_src = 1.25*1.3*1.4*1.6*1.5*Ti;
 
   // Physical velocity space limits
-  double vpar_max_elc = 6.0*vt_elc;
+  double vpar_max_elc = 8.0*vt_elc;
   double mu_max_elc = me*pow(4.0*vt_elc,2)/(2.0*B0);
 
   double vpar_max_ion = 6.0*vt_ion;
@@ -562,8 +562,8 @@ create_ctx(void)
   int Nvpar = 16; // Number of cells in vpar.
   int Nmu = 8; // Number of cells in mu.
 
-  double t_end = 4*5*100.0e-6;
-  double num_frames = 4*5*50;
+  double t_end = 2*4*5*100.0e-6;
+  double num_frames = 2*4*5*50;
   double write_phase_freq = 0.2; // Frequency of writing phase-space diagnostics (as a fraction of num_frames).
   int int_diag_calc_num = num_frames*100;
   double dt_failure_tol = 1.0e-4; // Minimum allowable fraction of initial time-step.
@@ -697,7 +697,7 @@ main(int argc, char **argv)
     .ctx_upar = &ctx,
     .upar= eval_upar,
     .ctx_temp = &ctx,
-    .temp = eval_temp_elc,      
+    .temp = eval_temp_elc, 
   };
 
   struct gkyl_gyrokinetic_species elc = {
@@ -705,7 +705,7 @@ main(int argc, char **argv)
     .charge = ctx.charge_elc, .mass = ctx.mass_elc,
     .lower = { ctx.vpar_min_elc_c, ctx.mu_min_elc_c},
     .upper = { ctx.vpar_max_elc_c, ctx.mu_max_elc_c},
-    .cells = { cells_v[0], cells_v[1] },
+    .cells = { 20, cells_v[1] },
     .polarization_density = ctx.n0,
 
     .mapc2p = {
