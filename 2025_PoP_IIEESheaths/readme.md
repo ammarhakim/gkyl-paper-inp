@@ -1,4 +1,4 @@
-2025 General kinetic ion-induced electron emission model for metallic walls applied to biased Z-pinch electrodes (PoP paper)
+2025 General kinetic ion-induced electron emission model for metallic walls applied to biased Z-pinch electrodes (Physics of Plasmas, DOI: https://doi.org/10.1063/5.0261942)
 
 All results in this paper use revision [4dda10bbc b181c5b50](https://github.com/ammarhakim/gkyl/commit/76220f59c607c7748e1f8e8c5b4f8a5cb4b3f536 (HEAD -> gk-g0-app)) of gkylzero.
 

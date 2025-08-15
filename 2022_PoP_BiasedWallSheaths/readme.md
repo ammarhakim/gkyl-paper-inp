@@ -1,4 +1,4 @@
-2022 Continuum kinetic investigation of impact of bias potential on sheath formation in the FuZE parameter regime (PoP paper)
+2023 Continuum kinetic investigation of impact of bias potential on sheath formation in the FuZE parameter regime (Physics of Plasmas, DOI: https://doi.org/10.1063/5.0134656)
 
 All results in this paper use revision [e53362c298c5](https://github.com/ammarhakim/gkyl/commit/e53362c298c5d57149c4d3c77e10b755fdcdb153).
 
