@@ -7,7 +7,7 @@ This repository contains input files and other supplimentary material from [Gkey
 **Note to authors:** please add another README.md file in each folder describing the input files (e.g. see 2020_JPP_VmLBO).
 
 The folders in this repository correspond to the following publications:
-- **2025_JGR_JET-PLUME**: C. R. Brown, G. G. Howes, K. G. Klein, and J. M. TenBarg, "Phase-Space Energy Transfer of Wave-Particle Interactions using the Field-Particle Correlation Technique and Linear Plasma Theory with JET-PLUME". Submitted to JGR
+- **2025_JGR_JET-PLUME**: C. R. Brown, G. G. Howes, K. G. Klein, and J. M. TenBarge, "Phase-Space Energy Transfer of Wave-Particle Interactions using the Field-Particle Correlation Technique and Linear Plasma Theory with JET-PLUME". Submitted to JGR
 - **2025_NF_Radiation**: J. Roeltgen, J. Juno, M. Kotschenreuther, T. Bernard, A. Shukla, M. Francisquez, A. Hakim, G. Hammett, D. Power, D. Hatch, "A Kinetic Line-Driven Radiation Operator and Its Application to Gyrokinetics". Submitted to Nuclear Fusion.
 - **2025_JPP_MJ**: G. Johnson, A. Hakim, J. Juno, "A Moment-Conserving Discontinuous Galerkin Representation of the Relativistic Maxwellian Distribution". Submited to the Journal of Plasma Physics.
 - **2024_PoP_KPS**: S. A. Conley, J. Juno, J. M. TenBarge, M. H. Barbhuiya, P. A. Cassak, G. G. Howes, E. Lichko. "The kinetic analogue of the pressure-strain interaction." Physics of Plasmas, **31**, 122117. 
