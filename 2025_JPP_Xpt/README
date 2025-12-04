@@ -1,0 +1,8 @@
+gridstep2x:
+   - An input file that just generates a STEP grid for plotting (no full simulation setup)
+
+rt_gk_step9:
+   - STEP simulation plotted in the paper in section 7
+
+gridmbasdex_2x:
+   - An input file that just generates an asdex grid for plotting (no full simulation setup)
