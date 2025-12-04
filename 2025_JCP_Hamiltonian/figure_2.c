@@ -6,7 +6,6 @@
 #include <gkyl_alloc.h>
 #include <gkyl_vlasov.h>
 #include <gkyl_util.h>
-#include <gkyl_wv_euler.h>
 
 #include <gkyl_null_comm.h>
 
@@ -20,28 +19,37 @@
 
 #include <rt_arg_parse.h>
 
-struct sodshock_ctx
+struct annulus_sodshock_ctx
 {
+  // Mathematical constants (dimensionless).
+  double pi;
+
   // Physical constants (using normalized code units).
   double mass; // Neutral mass.
   double charge; // Neutral charge.
 
-  double nl; // Left number density.
-  double Tl; // Left temperature.
-  double Vx_drift_l; // Left drift velocity (x-direction).
+  double nl; // Left/inner number density.
+  double Tl; // Left/inner temperature.
+  double V_r_drift_l; // Left/inner drift velocity (radial direction).
+  double V_theta_drift_l; // Left/inner drift velocity (angular direction).
 
-  double nr; // Right number density.
-  double Tr; // Right temperature.
-  double Vx_drift_r; // Right drift velocity (x-direction).
+  double nr; // Right/outer number density.
+  double Tr; // Right/outer temperature.
+  double V_r_drift_r; // Right/outer drift velocity (radial direction).
+  double V_theta_drift_r; // Right/outer drift velocity (angular direction).
 
   double vt; // Thermal velocity.
   double nu; // Collision frequency.
 
   // Simulation parameters.
-  int Nx; // Cell count (configuration space: x-direction).
-  int Nvx; // Cell count (velocity space: vx-direction).
-  double Lx; // Domain size (configuration space: x-direction).
-  double vx_max; // Domain boundary (velocity space: vx-direction).
+  int Nr; // Cell count (configuration space: radial direction).
+  int Ntheta; // Cell count (configuration space: angular direction).
+  int Nvr; // Cell count (velocity space: radial direction).
+  int Nvtheta; // Cell count (velocity space: angular direction).
+  double Lr; // Domain size (configuration space: radial direction).
+  double Ltheta; // Domain size (configuration space: angular direction).
+  double vr_max; // Domain boundary (velocity space: radial direction).
+  double vtheta_max; // Domain boundary (velocity space: angular direction).
   int poly_order; // Polynomial order.
   double cfl_frac; // CFL coefficient.
 
@@ -52,31 +60,42 @@ struct sodshock_ctx
   int integrated_L2_f_calcs; // Number of times to calculate integrated L2 norm of distribution function.
   double dt_failure_tol; // Minimum allowable fraction of initial time-step.
   int num_failures_max; // Maximum allowable number of consecutive small time-steps.
+
+  double midplane; // Radial midplane location designating jump in quantities.
 };
 
-struct sodshock_ctx
+struct annulus_sodshock_ctx
 create_ctx(void)
 {
+  // Mathematical constants (dimensionless).
+  double pi = M_PI;
+
   // Physical constants (using normalized code units).
   double mass = 1.0; // Neutral mass.
   double charge = 0.0; // Neutral charge.
 
-  double nl = 1.0; // Left number density.
-  double Tl = 1.0; // Left temperature.
-  double Vx_drift_l = 0.0; // Left drift velocity (x-direction).
+  double nl = 1.0; // Left/inner number density.
+  double Tl = 1.0; // Left/inner temperature.
+  double V_r_drift_l = 0.0; // Left/inner drift velocity (radial direction).
+  double V_theta_drift_l = 0.0; // Left/inner drift velocity (angular direction).
 
-  double nr = 0.125; // Right number density.
-  double Tr = sqrt(0.1 / 0.125); // Right temperature.
-  double Vx_drift_r = 0.0; // Right drift velocity (x-direction).
+  double nr = 0.125; // Right/outer number density.
+  double Tr = sqrt(0.1 / 0.125); // Right/outer temperature.
+  double V_r_drift_r = 0.0; // Right/outer drift velocity (radial direction).
+  double V_theta_drift_r = 0.0; // Right/outer drift velocity (angular direction).
 
   double vt = 1.0; // Thermal velocity.
   double nu = 15000.0; // Collision frequency.
 
   // Simulation parameters.
-  int Nx = 128; // Cell count (configuration space: x-direction).
-  int Nvx = 32; // Cell count (velocity space: vx-direction).
-  double Lx = 1.0; // Domain size (configuration space: x-direction).
-  double vx_max = 8.0 * vt; // Domain boundary (velocity space: vx-direction).
+  int Nr = 128; // Cell count (configuration space: radial direction).
+  int Ntheta = 1; // Cell count (configuration space: angular direction).
+  int Nvr = 12; // Cell count (velocity space: radial direction).
+  int Nvtheta = 12; // Cell count (velocity space: angular direction).
+  double Lr = 1.0; // Domain size (configuration space: radial direction).
+  double Ltheta = 2.0 * pi; // Domain size (configuration space: angular direction).
+  double vr_max = 8.0 * vt; // Domain boundary (velocity space: radial direction).
+  double vtheta_max = 8.0 * vt; // Domain boundary (velocity space: angular direction).
   int poly_order = 2; // Polynomial order.
   double cfl_frac = 1.0; // CFL coefficient.
 
@@ -86,23 +105,32 @@ create_ctx(void)
   int integrated_mom_calcs = INT_MAX; // Number of times to calculate integrated moments.
   int integrated_L2_f_calcs = INT_MAX; // Number of times to calculate integrated L2 norm of distribution function.
   double dt_failure_tol = 1.0e-4; // Minimum allowable fraction of initial time-step.
-  int num_failures_max = 20; // Maximum allowable number of consecutive small time-steps. 
+  int num_failures_max = 20; // Maximum allowable number of consecutive small time-steps.
 
-  struct sodshock_ctx ctx = {
+  double midplane = 1.0; // Radial midplane location designating jump in quantities.
+
+  struct annulus_sodshock_ctx ctx = {
+    .pi = pi,
     .mass = mass,
     .charge = charge,
     .nl = nl,
     .Tl = Tl,
-    .Vx_drift_l = Vx_drift_l,
+    .V_r_drift_l = V_r_drift_l,
+    .V_theta_drift_l = V_theta_drift_l,
     .nr = nr,
     .Tr = Tr,
-    .Vx_drift_r = Vx_drift_r,
+    .V_r_drift_r = V_r_drift_r,
+    .V_theta_drift_r = V_theta_drift_r,
     .vt = vt,
     .nu = nu,
-    .Nx = Nx,
-    .Nvx = Nvx,
-    .Lx = Lx,
-    .vx_max = vx_max,
+    .Nr = Nr,
+    .Ntheta = Ntheta,
+    .Nvr = Nvr,
+    .Nvtheta = Nvtheta,
+    .Lr = Lr,
+    .Ltheta = Ltheta,
+    .vr_max = vr_max,
+    .vtheta_max = vtheta_max,
     .poly_order = poly_order,
     .cfl_frac = cfl_frac,
     .t_end = t_end,
@@ -112,6 +140,7 @@ create_ctx(void)
     .integrated_L2_f_calcs = integrated_L2_f_calcs,
     .dt_failure_tol = dt_failure_tol,
     .num_failures_max = num_failures_max,
+    .midplane = midplane,
   };
 
   return ctx;
@@ -120,22 +149,23 @@ create_ctx(void)
 void
 evalDensityInit(double t, const double* GKYL_RESTRICT xn, double* GKYL_RESTRICT fout, void* ctx)
 {
-  struct sodshock_ctx *app = ctx;
-  double x = xn[0];
+  struct annulus_sodshock_ctx *app = ctx;
+  double r = xn[0];
 
   double nl = app->nl;
   double nr = app->nr;
+  double midplane = app->midplane;
 
   double n = 0.0;
 
-  if (x < 0.5) {
-    n = nl; // Total number density (left).
+  if (r < midplane) {
+    n = nl; // Total number density (left/inner).
   }
   else {
-    n = nr; // Total number density (right).
+    n = nr; // Total number density (right/outer).
   }
-  
-  double metric_det = 1.0;
+
+  double metric_det = r;
 
   // Set total number density.
   fout[0] = metric_det * n;
@@ -144,19 +174,20 @@ evalDensityInit(double t, const double* GKYL_RESTRICT xn, double* GKYL_RESTRICT 
 void
 evalTempInit(double t, const double* GKYL_RESTRICT xn, double* GKYL_RESTRICT fout, void* ctx)
 {
-  struct sodshock_ctx *app = ctx;
-  double x = xn[0];
+  struct annulus_sodshock_ctx *app = ctx;
+  double r = xn[0];
 
   double Tl = app->Tl;
   double Tr = app->Tr;
+  double midplane = app->midplane;
 
   double T = 0.0;
 
-  if (x < 0.5) {
-    T = Tl; // Isotropic temperature (left).
+  if (r < midplane) {
+    T = Tl; // Isotropic temperature (left/inner).
   }
   else {
-    T = Tr; // Isotropic temperature (right).
+    T = Tr; // Isotropic temperature (right/outer).
   }
 
   // Set isotropic temperature.
@@ -166,29 +197,37 @@ evalTempInit(double t, const double* GKYL_RESTRICT xn, double* GKYL_RESTRICT fou
 void
 evalVDriftInit(double t, const double* GKYL_RESTRICT xn, double* GKYL_RESTRICT fout, void* ctx)
 {
-  struct sodshock_ctx *app = ctx;
-  double x = xn[0];
+  struct annulus_sodshock_ctx *app = ctx;
+  double r = xn[0];
 
-  double Vx_drift_l = app->Vx_drift_l;
-  double Vx_drift_r = app->Vx_drift_r;
+  double V_r_drift_l = app->V_r_drift_l;
+  double V_theta_drift_l = app->V_theta_drift_l;
 
-  double Vx_drift = 0.0;
+  double V_r_drift_r = app->V_r_drift_r;
+  double V_theta_drift_r = app->V_theta_drift_r;
 
-  if (x < 0.5) {
-    Vx_drift = Vx_drift_l; // Total drift velocity (left).
+  double midplane = app->midplane;
+
+  double V_r_drift = 0.0;
+  double V_theta_drift = 0.0;
+
+  if (r < midplane) {
+    V_r_drift = V_r_drift_l; // Radial drift velocity (left/inner).
+    V_theta_drift = V_theta_drift_l; // Angular drift velocity (left/inner).
   }
   else {
-    Vx_drift = Vx_drift_r; // Total drift velocity (right).
+    V_r_drift = V_r_drift_r; // Radial drift velocity (right/outer).
+    V_theta_drift = V_theta_drift_r; // Angular drift velocity (right/outer).
   }
 
   // Set total drift velocity.
-  fout[0] = Vx_drift;
+  fout[0] = V_r_drift; fout[1] = V_theta_drift;
 }
 
 void
 evalNu(double t, const double* GKYL_RESTRICT xn, double* GKYL_RESTRICT fout, void* ctx)
 {
-  struct sodshock_ctx *app = ctx;
+  struct annulus_sodshock_ctx *app = ctx;
 
   double nu = app->nu;
 
@@ -199,10 +238,14 @@ evalNu(double t, const double* GKYL_RESTRICT xn, double* GKYL_RESTRICT fout, voi
 void
 evalHamiltonian(double t, const double* GKYL_RESTRICT xn, double* GKYL_RESTRICT fout, void* ctx)
 {
-  double p_x_dot = xn[1];
+  double q_r = xn[0], p_r_dot = xn[2], p_theta_dot = xn[3];
 
-  double inv_metric_x_x = 1.0;
-  double hamiltonian = (0.5 * inv_metric_x_x * p_x_dot * p_x_dot); // Canonical Hamiltonian.
+  double inv_metric_r_r = 1.0;
+  double inv_metric_r_theta = 0.0;
+  double inv_metric_theta_theta = 1.0 / (q_r * q_r);
+
+  double hamiltonian = (0.5 * inv_metric_r_r * p_r_dot * p_r_dot) + (0.5 * (2.0 * inv_metric_r_theta * p_r_dot * p_theta_dot)) +
+    (0.5 * inv_metric_theta_theta * p_theta_dot * p_theta_dot); // Canonical Hamiltonian.
   
   // Set canonical Hamiltonian.
   fout[0] = hamiltonian;
@@ -211,25 +254,35 @@ evalHamiltonian(double t, const double* GKYL_RESTRICT xn, double* GKYL_RESTRICT 
 void
 evalInvMetric(double t, const double* GKYL_RESTRICT xn, double* GKYL_RESTRICT fout, void* ctx)
 {
-  double inv_metric_x_x = 1.0; // Inverse metric tensor (x-x component).
+  double q_r = xn[0];
+
+  double inv_metric_r_r = 1.0; // Inverse metric tensor (radial-radial component).
+  double inv_metric_r_theta = 0.0; // Inverse metric tensor (radial-angular component).
+  double inv_metric_theta_theta = 1.0 / (q_r * q_r); // Inverse metric tensor (angular-angular component).
   
   // Set inverse metric tensor.
-  fout[0] = inv_metric_x_x;
+  fout[0] = inv_metric_r_r; fout[1] = inv_metric_r_theta; fout[2] = inv_metric_theta_theta;
 }
 
 void
 evalMetric(double t, const double* GKYL_RESTRICT xn, double* GKYL_RESTRICT fout, void* ctx)
 {
-  double metric_x_x = 1.0; // Metric tensor (x-x component).
+  double q_r = xn[0];
+
+  double metric_r_r = 1.0; // mMtric tensor (radial-radial component).
+  double metric_r_theta = 0.0; // Metric tensor (radial-angular component).
+  double metric_theta_theta = q_r * q_r; // Metric tensor (angular-angular component).
   
   // Set metric tensor.
-  fout[0] = metric_x_x;
+  fout[0] = metric_r_r; fout[1] = metric_r_theta; fout[2] = metric_theta_theta;
 }
 
 void
 evalMetricDet(double t, const double* GKYL_RESTRICT xn, double* GKYL_RESTRICT fout, void* ctx)
 {
-  double metric_det = 1.0; // Metric tensor determinant.
+  double q_r = xn[0];
+
+  double metric_det = q_r; // Metric tensor determinant.
   
   // Set metric tensor determinant.
   fout[0] = metric_det;
@@ -248,8 +301,6 @@ write_data(struct gkyl_tm_trigger* iot, gkyl_vlasov_app* app, double t_curr, boo
     gkyl_vlasov_app_write_field_energy(app);
     gkyl_vlasov_app_write_integrated_mom(app);
     gkyl_vlasov_app_write_integrated_L2_f(app);
-
-    gkyl_vlasov_app_calc_mom(app);
     gkyl_vlasov_app_write_mom(app, t_curr, frame);
   }
 }
@@ -294,10 +345,12 @@ main(int argc, char **argv)
     gkyl_mem_debug_set(true);
   }
 
-  struct sodshock_ctx ctx = create_ctx(); // Context for initialization functions.
+  struct annulus_sodshock_ctx ctx = create_ctx(); // Context for initialization functions.
 
-  int NX = APP_ARGS_CHOOSE(app_args.xcells[0], ctx.Nx);
-  int NVX = APP_ARGS_CHOOSE(app_args.vcells[0], ctx.Nvx);
+  int NR = APP_ARGS_CHOOSE(app_args.xcells[0], ctx.Nr);
+  int NTHETA = APP_ARGS_CHOOSE(app_args.xcells[1], ctx.Ntheta);
+  int NVR = APP_ARGS_CHOOSE(app_args.vcells[0], ctx.Nvr);
+  int NVTHETA = APP_ARGS_CHOOSE(app_args.vcells[1], ctx.Nvtheta);
 
   int nrank = 1; // Number of processors in simulation.
 #ifdef GKYL_HAVE_MPI
@@ -306,7 +359,7 @@ main(int argc, char **argv)
   }
 #endif  
 
-  int ccells[] = { NX };
+  int ccells[] = { NR, NTHETA };
   int cdim = sizeof(ccells) / sizeof(ccells[0]);
 
   int cuts[cdim];
@@ -380,9 +433,9 @@ main(int argc, char **argv)
     .name = "neut",
     .model_id = GKYL_MODEL_CANONICAL_PB,
     .charge = ctx.charge, .mass = ctx.mass,
-    .lower = { -ctx.vx_max },
-    .upper = { ctx.vx_max }, 
-    .cells = { NVX },
+    .lower = { -ctx.vr_max, -ctx.vtheta_max },
+    .upper = { ctx.vr_max, ctx.vtheta_max },
+    .cells = { NVR, NVTHETA },
 
     .hamil = evalHamiltonian,
     .hamil_ctx = &ctx,
@@ -392,7 +445,6 @@ main(int argc, char **argv)
     .h_ij_inv_ctx = &ctx,
     .det_h = evalMetricDet,
     .det_h_ctx = &ctx,
-    .output_f_lte = true,
 
     .num_init = 1, 
     .projection[0] = {
@@ -408,45 +460,54 @@ main(int argc, char **argv)
       .max_iter = 0,
       .use_last_converged = false,
     },
+    
     .collisions =  {
       .collision_id = GKYL_BGK_COLLISIONS,
       .self_nu = evalNu,
       .ctx = &ctx,
       .has_implicit_coll_scheme = true,
+    },
+
+    .correct = {
       .correct_all_moms = true,
-      .iter_eps = 0.0,
-      .max_iter = 0,
+      .iter_eps = 1.0e-12,
+      .max_iter = 100,
       .use_last_converged = false,
+    },
+
+    .bcx = {
+      .lower = { .type = GKYL_SPECIES_REFLECT, },
+      .upper = { .type = GKYL_SPECIES_REFLECT, },
     },
     
     .num_diag_moments = 4,
-    .diag_moments = { "M0", "M1i", "LTEMoments", "MEnergy" },
+    .diag_moments = { GKYL_F_MOMENT_M0, GKYL_F_MOMENT_M1, GKYL_F_MOMENT_LTE, GKYL_F_MOMENT_ENERGY },
   };
 
   // Vlasov-Maxwell app.
   struct gkyl_vm app_inp = {
-    .name = "can_pb_neut_bgk_sodshock_im_1x1v_p2",
+   .name = "can_pb_bgk_surf_annulus_sodshock_im_2x2v_p2",
 
-    .cdim = 1, .vdim = 1, 
-    .lower = { 0.0 },
-    .upper = { ctx.Lx },
-    .cells = { NX },
+   .cdim = 2, .vdim = 2, 
+   .lower = { 0.5, 0.0 },
+   .upper = { 0.5 + ctx.Lr, ctx.Ltheta },
+   .cells = { NR, NTHETA },
 
-    .poly_order = ctx.poly_order,
-    .basis_type = app_args.basis_type,
-    .cfl_frac = ctx.cfl_frac,
+   .poly_order = ctx.poly_order,
+   .basis_type = app_args.basis_type,
+   .cfl_frac = ctx.cfl_frac,
 
-    .num_periodic_dir = 0,
-    .periodic_dirs = { },
+   .num_periodic_dir = 1,
+   .periodic_dirs = { 1 },
 
-    .num_species = 1,
-    .species = { neut },
+   .num_species = 1,
+   .species = { neut },
 
-    .skip_field = true,
+   .skip_field = true,
 
-    .parallelism = {
+   .parallelism = {
       .use_gpu = app_args.use_gpu,
-      .cuts = { app_args.cuts[0] },
+      .cuts = { app_args.cuts[0], app_args.cuts[1] },
       .comm = comm,
     },
   };
@@ -579,7 +640,9 @@ main(int argc, char **argv)
   gkyl_vlasov_app_cout(app, stdout, "Total updates took %g secs\n", stat.total_tm);
 
   gkyl_vlasov_app_cout(app, stdout, "Number of write calls %ld\n", stat.n_io);
-  gkyl_vlasov_app_cout(app, stdout, "IO time took %g secs \n", stat.io_tm);
+  double io_tm =  stat.field_io_tm + stat.species_io_tm + stat.field_diag_io_tm + stat.species_diag_io_tm;
+  gkyl_vlasov_app_cout(app, stdout, "IO time took %g secs \n", io_tm);
+
 
 freeresources:
   // Free resources after simulation completion.
@@ -595,4 +658,3 @@ mpifinalize:
 
   return 0;
 }
-

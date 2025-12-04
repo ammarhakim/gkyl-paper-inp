@@ -1,245 +1,350 @@
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <time.h>
 
 #include <gkyl_alloc.h>
 #include <gkyl_vlasov.h>
+#include <gkyl_util.h>
+
+#include <gkyl_null_comm.h>
+
+#ifdef GKYL_HAVE_MPI
+#include <mpi.h>
+#include <gkyl_mpi_comm.h>
+#ifdef GKYL_HAVE_NCCL
+#include <gkyl_nccl_comm.h>
+#endif
+#endif
+
 #include <rt_arg_parse.h>
 
-
-static inline double sq(double x) { return x*x; }
-
-struct annulus_sodshock_ctx
+struct sphere_rot_ctx
 {
   // Mathematical constants (dimensionless).
   double pi;
 
-  double rhol; // Left/inner density.
-  double ul; // Left/inner velocity (r-direction).
-  double ul_theta; // Left/inner velocity (theta-direction).
-  double templ; // Left/inner temperature.
+  // Physical constants (using normalized code units).
+  double mass; // Neutral mass.
+  double charge; // Neutral charge.
 
-  double rhor; // Right/outer density.
-  double ur; // Right/outer velocity (r-direction).
-  double ur_theta; // Right/outer velocity (theta-direction).
-  double tempr; // Right/outer temperature.
+  double nl; // Left/inner number density.
+  double Tl; // Left/inner pressure.
+  double V_theta_drift_l; // Left/inner drift velocity (polar angular direction).
+  double V_phi_drift_l; // Left/inner drift velocity (azimuthal angular direction).
+
+  double vt; // Thermal velocity.
+  double nu; // Collision frequency.
 
   // Simulation parameters.
-  int Nr; // Cell count (configuration space: r-direction).
-  int Nv; // Cell count (velocity space: all directions).
-  double Rmin; // Domain size (configuration space: r-direction, min value).
-  double Rmax; // Domain size (configuration space: r-direction, max value).
+  int Ntheta; // Cell count (configuration space: polar angular direction).
+  int Nphi; // Cell count (configuration space: azimuthal angular direction).
+  int Nvtheta; // Cell count (velocity space: polar angular direction).
+  int Nvphi; // Cell count (velocity space: azimuthal angular direction).
+  double Ltheta; // Domain size (configuration space: polar angular direction).
+  double Lphi; // Domain size (configuration space: azimuthal angular direction).
+  double vtheta_max; // Domain boundary (velocity space: polar angular direction).
+  double vphi_max; // Domain boundary (velocity space: azimuthal angular direction).
   int poly_order; // Polynomial order.
   double cfl_frac; // CFL coefficient.
 
   double t_end; // Final simulation time.
   int num_frames; // Number of output frames.
+  int field_energy_calcs; // Number of times to calculate field energy.
+  int integrated_mom_calcs; // Number of times to calculate integrated moments.
+  int integrated_L2_f_calcs; // Number of times to calculate integrated L2 norm of distribution function.
   double dt_failure_tol; // Minimum allowable fraction of initial time-step.
   int num_failures_max; // Maximum allowable number of consecutive small time-steps.
 
-  double charge; // charge
-  double mass; // mass
-  double vt; // thermal velocity
-  double midplane; // midplane of the theta coord.
+  double R; // Radius of the sphere.
+  double theta_bump_0; // Polar angular theta_bump_0 location.
+  double phi_bump_0; // Polar angular boundary location designating jump in quantities.
+  double L_bump; // Width of the bump
+
+  double omega; // Sphere rotation rate
 };
 
-struct annulus_sodshock_ctx
+struct sphere_rot_ctx
 create_ctx(void)
 {
   // Mathematical constants (dimensionless).
   double pi = M_PI;
 
-  double rhol = 1.0; // Left/inner density.
-  double ul = 0.0; // Left/inner velocity (r-direction).
-  double ul_theta = 0.0; // Left/inner velocity (theta-direction).
-  double templ = 1.0; // Left/inner temperature.
+  // Physical constants (using normalized code units).
+  double mass = 1.0; // Neutral mass.
+  double charge = 0.0; // Neutral charge.
 
-  double rhor = 1.0; // Right/outer density.
-  double ur = 0.0; // Right/outer velocity (r-direction).
-  double ur_theta = 0.0; // Right/outer velocity (theta-direction).
-  double tempr = 1.0; // Right/outer temperature.
+  double nl = 1.0; // Left/inner number density.
+  double Tl = 1.0/6400.0; // Left/inner temperature.
+  double V_theta_drift_l = 1.0; // Left/inner drift velocity (polar angular direction).
+  double V_phi_drift_l = 0.0; // Left/inner drift velocity (azimuthal angular direction).
+
+  double vt = sqrt(Tl); // Thermal velocity.
+  double nu = 0.0; // (No Collisions) Collision frequency.
 
   // Simulation parameters.
-  int Nr = 128; // Cell count (configuration space: x-direction).
-  int Nv = 8; // Cell count (velocity space: all directions).
-  double Rmin = 0.5; // Domain size (configuration space: r-direction, min value).
-  double Rmax = 1.5; // Domain size (configuration space: r-direction, max value).
+  int Ntheta = 32; // Cell count (configuration space: polar angular direction).
+  int Nphi = 172; // Cell count (configuration space: azimuthal angular direction).
+  int Nvtheta = 192; // Cell count (velocity space: polar angular direction).
+  int Nvphi = 24; // Cell count (velocity space: azimuthal angular direction).
+  double Ltheta = (3.0 * pi) / 8.0; // Domain size (configuration space: polar angular direction).
+  double Lphi = 2.0 * pi; // Domain size (configuration space: azimuthal angular direction).
+  double vtheta_max = 5.0 * vt; // Domain boundary (velocity space: polar angular direction).
+  double vphi_max = 5.0 * vt; // Domain boundary (velocity space: azimuthal angular direction).
   int poly_order = 2; // Polynomial order.
-  double cfl_frac = 0.9; // CFL coefficient.
+  double cfl_frac = 1.0; // CFL coefficient.
 
-  double t_end = 1e-5; // Final simulation time.
-  int num_frames = 1; // Number of output frames.
+  double t_end = 2.0; // Final simulation time.
+  int num_frames = 80; // Number of output frames.
+  int field_energy_calcs = INT_MAX; // Number of times to calculate field energy.
+  int integrated_mom_calcs = INT_MAX; // Number of times to calculate integrated moments.
+  int integrated_L2_f_calcs = INT_MAX; // Number of times to calculate integrated L2 norm of distribution function.
   double dt_failure_tol = 1.0e-4; // Minimum allowable fraction of initial time-step.
   int num_failures_max = 20; // Maximum allowable number of consecutive small time-steps.
 
-  double charge = 1.0; // charge
-  double mass = 1.0; // mass
-  double vt = 1.0; // thermal velocity
-  double midplane = 1.0; // Midplane location in R for the jump in quantities
+  double R = 1.0; // Radius of the sphere.
+  double theta_bump_0 = pi / 2.0;
+  double phi_bump_0 = pi; 
 
-  struct annulus_sodshock_ctx ctx = {
+  double omega = 1.0; // Spin rate of the sphere
+  double L_bump = 0.1;
+  
+  struct sphere_rot_ctx ctx = {
     .pi = pi,
-    .rhol = rhol,
-    .ul = ul,
-    .ul_theta = ul_theta,
-    .templ = templ,
-    .rhor = rhor,
-    .ur = ur,
-    .ur_theta = ur_theta,
-    .tempr = tempr,
-    .Nr = Nr,
-    .Nv = Nv,
-    .Rmin = Rmin,
-    .Rmax = Rmax,
+    .mass = mass,
+    .charge = charge,
+    .nl = nl,
+    .Tl = Tl,
+    .V_theta_drift_l = V_theta_drift_l,
+    .V_phi_drift_l = V_phi_drift_l,
+    .vt = vt,
+    .nu = nu,
+    .Ntheta = Ntheta,
+    .Nphi = Nphi,
+    .Nvtheta = Nvtheta,
+    .Nvphi = Nvphi,
+    .Ltheta = Ltheta,
+    .Lphi = Lphi,
+    .vtheta_max = vtheta_max,
+    .vphi_max = vphi_max,
     .poly_order = poly_order,
     .cfl_frac = cfl_frac,
     .t_end = t_end,
     .num_frames = num_frames,
+    .field_energy_calcs = field_energy_calcs,
+    .integrated_mom_calcs = integrated_mom_calcs,
+    .integrated_L2_f_calcs = integrated_L2_f_calcs,
     .dt_failure_tol = dt_failure_tol,
     .num_failures_max = num_failures_max,
-    .charge = charge,
-    .mass = mass,
-    .vt = vt,
-    .midplane = midplane,
+    .R = R,
+    .theta_bump_0 = theta_bump_0,
+    .phi_bump_0 = phi_bump_0,
+    .L_bump = L_bump,
+    .omega = omega,
   };
 
   return ctx;
 }
 
-
-void
-evalNu(double t, const double * GKYL_RESTRICT xn, double* GKYL_RESTRICT fout, void *ctx)
-{
-  fout[0] = 15000.0;
-}
-
-void 
-h_ij_inv(double t, const double* xn, double* fout, void* ctx)
-{
-  // Inverse metric tensor, must be symmetric!
-  // [h^{xx},h^{xy},h^{yy}]
-  struct annulus_sodshock_ctx *app = (struct annulus_sodshock_ctx *)ctx;
-  double q_R = xn[0];
-  const double q[1] = {q_R};
-
-  // [h^{rr},h^{rtheta},h^{thetatheta}]
-  fout[0] = 1.0;
-  fout[1] = 0.0;
-  fout[2] = 1.0 / pow(q[0], 2);
-}
-
-void 
-det_h(double t, const double* xn, double* fout, void* ctx)
-{
-  // determinant of the metric tensor: J = det(h_{ij})
-  struct annulus_sodshock_ctx *app = (struct annulus_sodshock_ctx *)ctx;
-  double q_R = xn[0];
-  const double q[1] = {q_R};
-  fout[0] = q_R;
-}
-
-void 
-hamil(double t, const double* xn, double* fout, void* ctx)
-{
-  // Canonical coordinates:
-  double q_R = xn[0], p_R_dot = xn[1], p_theta_dot = xn[2];
-  const double q[1] = {q_R};
-  const double w[2] = {p_R_dot, p_theta_dot};
-  struct annulus_sodshock_ctx *app = (struct annulus_sodshock_ctx *)ctx;
-  double *h_inv = malloc(3 * sizeof(double));
-  h_ij_inv(t, xn, h_inv, ctx); 
-  fout[0] = 0.5 * h_inv[0] * w[0] * w[0] + 
-            0.5 * (2.0* h_inv[1] * w[1] * w[0]) + 
-            0.5 * h_inv[2] * w[1] * w[1];
-  free(h_inv);
-}
-
 void
 evalDensityInit(double t, const double* GKYL_RESTRICT xn, double* GKYL_RESTRICT fout, void* ctx)
 {
-  double R = xn[0];
-  struct annulus_sodshock_ctx *app = ctx;
-  double pi = app -> pi;
-  double rhol = app -> rhol;
-  double rhor = app -> rhor;
-  double midplane = app -> midplane;
+  struct sphere_rot_ctx *app = ctx;
+  double R = app->R;
+  double pi = app->pi;
+  double theta = xn[0], phi = xn[1];
 
-  double rho = 0.0;
+  double theta_bump_0 = app->theta_bump_0;
+  double phi_bump_0 = app->phi_bump_0;
 
-  if (R < midplane) {
-    rho = rhol; // Density (left/inner).
-  }
-  else {
-    rho = rhor; // Density (right/outer).
-  }
+  double nl = app->nl;
 
-  // Set the density.
-  double det_h_val;
-  det_h(t, xn, &det_h_val, ctx); 
-  fout[0] = rho*det_h_val;
-}
+  double metric_det = (R * R) * sin(theta);
 
-void
-evalVDriftInit(double t, const double* GKYL_RESTRICT xn, double* GKYL_RESTRICT fout, void* ctx)
-{
-  double R = xn[0];
-  struct annulus_sodshock_ctx *app = ctx;
-  double pi = app -> pi;
-  double ul_R = app -> ul;
-  double ur_R = app -> ur;
-  double ul_theta = app -> ul_theta;
-  double ur_theta = app -> ur_theta;
-  double midplane = app -> midplane;
+  double omega = app->omega;
+  double T = app->Tl;
 
-  double u_R = 0.0;
-  double u_theta = 0.0;
+  // Time equilibrium factor
+  double n = nl;
+  double L_bump = app->L_bump;
+  // Peaked around theta_0, phi_0
+  n = n * exp( - ( (theta - theta_bump_0) * (theta - theta_bump_0) + (phi - phi_bump_0) * (phi - phi_bump_0) * sin(theta) * sin(theta) )/ (0.5*L_bump) );
 
-
-  if (R < midplane) {
-    u_R = ul_R; // r-velocity (left/inner).
-    u_theta = ul_theta; // theta-velocity (left/inner).
-  }
-  else {
-    u_R = ur_R; // r-velocity (right/outer).
-    u_theta = ur_theta; // theta-velocity (right-outer).
-  }
-
-  // Set the velocity.
-  fout[0] = u_R; 
-  fout[1] = u_theta;
+  // Set total number density.
+  fout[0] = metric_det * n;
 }
 
 void
 evalTempInit(double t, const double* GKYL_RESTRICT xn, double* GKYL_RESTRICT fout, void* ctx)
 {
-  double R = xn[0];
-  struct annulus_sodshock_ctx *app = ctx;
-  double pi = app -> pi;
-  double templ = app -> templ;
-  double tempr = app -> tempr;
-  double midplane = app -> midplane;
+  struct sphere_rot_ctx *app = ctx;
+  double theta = xn[0];
 
-  double rho = 0.0;
-  double temperature = 0.0;
+  double Tl = app->Tl;
 
-  if (R < midplane) {
-    temperature = templ; // Temperature (left/inner).
-  }
-  else {
-    temperature = tempr; // Temperature (right/outer).
-  }
+  double T = Tl;
 
-  // Set temperature
-  fout[0] = temperature;
+  // Set isotropic temperature.
+  fout[0] = T;
 }
 
 void
-write_data(struct gkyl_tm_trigger *iot, gkyl_vlasov_app *app, double tcurr)
+evalVDriftInit(double t, const double* GKYL_RESTRICT xn, double* GKYL_RESTRICT fout, void* ctx)
 {
-  if (gkyl_tm_trigger_check_and_bump(iot, tcurr)) {
-    gkyl_vlasov_app_write(app, tcurr, iot->curr-1);
-    gkyl_vlasov_app_calc_mom(app); gkyl_vlasov_app_write_mom(app, tcurr, iot->curr-1);
+  struct sphere_rot_ctx *app = ctx;
+  double theta = xn[0];
+
+  double V_theta_drift_l = app->V_theta_drift_l;
+
+  double V_theta_drift = V_theta_drift_l;
+  double V_phi_drift =  1.0 - app->omega * sin(theta) * sin(theta);
+
+  // Set total drift velocity.
+  fout[0] = V_theta_drift; fout[1] = V_phi_drift;
+}
+
+void
+evalNu(double t, const double* GKYL_RESTRICT xn, double* GKYL_RESTRICT fout, void* ctx)
+{
+  struct sphere_rot_ctx *app = ctx;
+
+  double nu = app->nu;
+
+  // Set collision frequency.
+  fout[0] = nu;
+}
+
+void
+evalHamiltonian(double t, const double* GKYL_RESTRICT xn, double* GKYL_RESTRICT fout, void* ctx)
+{
+  struct sphere_rot_ctx *app = ctx;
+  double omega = app->omega;
+  double q_theta = xn[0], p_theta_dot = xn[2], p_phi_dot = xn[3];
+  
+  double R = app->R;
+
+  double inv_metric_theta_theta = 1.0 / (R * R);
+  double inv_metric_theta_phi = 0.0;
+  double inv_metric_phi_phi = 1.0 / ((R * sin(q_theta)) * (R * sin(q_theta)));
+
+  double hamiltonian = (0.5 * inv_metric_theta_theta * p_theta_dot * p_theta_dot) + (0.5 * (2.0 * inv_metric_theta_phi * p_theta_dot * p_phi_dot)) +
+    (0.5 * inv_metric_phi_phi * p_phi_dot * p_phi_dot) - omega*p_phi_dot; // Canonical Hamiltonian.
+  
+  // Set canonical Hamiltonian.
+  fout[0] = hamiltonian;
+}
+
+void
+evalInvMetric(double t, const double* GKYL_RESTRICT xn, double* GKYL_RESTRICT fout, void* ctx)
+{
+  struct sphere_rot_ctx *app = ctx;
+  double q_theta = xn[0];
+
+  double R = app->R;
+
+  double inv_metric_theta_theta = 1.0 / (R * R); // Inverse metric tensor (polar-polar component).
+  double inv_metric_theta_phi = 0.0; // Inverse metric tensor (polar-azimuthal component).
+  double inv_metric_phi_phi = 1.0 / ((R * sin(q_theta)) * (R * sin(q_theta))); // Inverse metric tensor (azimuthal-azimuthal component).
+  
+  // Set inverse metric tensor.
+  fout[0] = inv_metric_theta_theta; fout[1] = inv_metric_theta_phi; fout[2] = inv_metric_phi_phi;
+}
+
+void
+evalMetric(double t, const double* GKYL_RESTRICT xn, double* GKYL_RESTRICT fout, void* ctx)
+{
+  struct sphere_rot_ctx *app = ctx;
+  double q_theta = xn[0];
+
+  double R = app->R;
+
+  double metric_theta_theta = R * R; // Metric tensor (polar-polar component).
+  double metric_theta_phi = 0.0; // Metric tensor (polar-azimuthal component).
+  double metric_phi_phi = (R * sin(q_theta)) * (R * sin(q_theta)); // Metric tensor (azimuthal-azimuthal component).
+  
+  // Set metric tensor.
+  fout[0] = metric_theta_theta; fout[1] = metric_theta_phi; fout[2] = metric_phi_phi;
+}
+
+void
+evalMetricDet(double t, const double* GKYL_RESTRICT xn, double* GKYL_RESTRICT fout, void* ctx)
+{
+  struct sphere_rot_ctx *app = ctx;
+  double q_theta = xn[0];
+
+  double R = app->R;
+
+  double metric_det = (R * R) * sin(q_theta); // Metric tensor determinant.
+  
+  // Set metric tensor determinant.
+  fout[0] = metric_det;
+}
+
+void
+evalFlows(double t, const double* GKYL_RESTRICT xn, double* GKYL_RESTRICT fout, void* ctx)
+{
+  struct sphere_rot_ctx *app = ctx;
+  double q_theta = xn[0];
+  
+  double R = app->R;
+  double omega = app->omega;
+  
+  // Set canonical flows
+  fout[0] = 0.0;
+  fout[1] = omega * sin(q_theta) * sin(q_theta);
+}
+
+void
+evalEffectivePot(double t, const double* GKYL_RESTRICT xn, double* GKYL_RESTRICT fout, void* ctx)
+{
+  struct sphere_rot_ctx *app = ctx;
+  double q_theta = xn[0];
+  
+  double R = app->R;
+  double omega = app->omega;
+  
+  // Set canonical effective potential.
+  fout[0] = - 0.5 * omega * omega * sin(q_theta) * sin(q_theta);
+}
+
+void
+write_data(struct gkyl_tm_trigger* iot, gkyl_vlasov_app* app, double t_curr, bool force_write)
+{
+  if (gkyl_tm_trigger_check_and_bump(iot, t_curr) || force_write) {
+    int frame = iot->curr - 1;
+    if (force_write) {
+      frame = iot->curr;
+    }
+
+    gkyl_vlasov_app_write(app, t_curr, frame);
+    gkyl_vlasov_app_write_field_energy(app);
     gkyl_vlasov_app_write_integrated_mom(app);
+    gkyl_vlasov_app_write_integrated_L2_f(app);
+    gkyl_vlasov_app_write_mom(app, t_curr, frame);
+  }
+}
+
+void
+calc_field_energy(struct gkyl_tm_trigger* fet, gkyl_vlasov_app* app, double t_curr, bool force_calc)
+{
+  if (gkyl_tm_trigger_check_and_bump(fet, t_curr) || force_calc) {
+    gkyl_vlasov_app_calc_field_energy(app, t_curr);
+  }
+}
+
+void
+calc_integrated_mom(struct gkyl_tm_trigger* imt, gkyl_vlasov_app* app, double t_curr, bool force_calc)
+{
+  if (gkyl_tm_trigger_check_and_bump(imt, t_curr) || force_calc) {
+    gkyl_vlasov_app_calc_integrated_mom(app, t_curr);
+  }
+}
+
+void
+calc_integrated_L2_f(struct gkyl_tm_trigger* l2t, gkyl_vlasov_app* app, double t_curr, bool force_calc)
+{
+  if (gkyl_tm_trigger_check_and_bump(l2t, t_curr) || force_calc) {
+    gkyl_vlasov_app_calc_integrated_L2_f(app, t_curr);
   }
 }
 
@@ -248,132 +353,334 @@ main(int argc, char **argv)
 {
   struct gkyl_app_args app_args = parse_app_args(argc, argv);
 
+#ifdef GKYL_HAVE_MPI
+  if (app_args.use_mpi) {
+    MPI_Init(&argc, &argv);
+  }
+#endif
+
   if (app_args.trace_mem) {
     gkyl_cu_dev_mem_debug_set(true);
     gkyl_mem_debug_set(true);
   }
-  struct annulus_sodshock_ctx ctx = create_ctx(); // context for init functions
 
-  int NR = APP_ARGS_CHOOSE(app_args.xcells[0], ctx.Nr);
+  struct sphere_rot_ctx ctx = create_ctx(); // Context for initialization functions.
 
-  // electrons
+  int NTHETA = APP_ARGS_CHOOSE(app_args.xcells[0], ctx.Ntheta);
+  int NPHI = APP_ARGS_CHOOSE(app_args.xcells[1], ctx.Nphi);
+  int NVTHETA = APP_ARGS_CHOOSE(app_args.vcells[0], ctx.Nvtheta);
+  int NVPHI = APP_ARGS_CHOOSE(app_args.vcells[1], ctx.Nvphi);
+
+  int nrank = 1; // Number of processors in simulation.
+#ifdef GKYL_HAVE_MPI
+  if (app_args.use_mpi) {
+    MPI_Comm_size(MPI_COMM_WORLD, &nrank);
+  }
+#endif  
+
+  int ccells[] = { NTHETA, NPHI };
+  int cdim = sizeof(ccells) / sizeof(ccells[0]);
+
+  int cuts[cdim];
+#ifdef GKYL_HAVE_MPI  
+  for (int d = 0; d < cdim; d++) {
+    if (app_args.use_mpi) {
+      cuts[d] = app_args.cuts[d];
+    }
+    else {
+      cuts[d] = 1;
+    }
+  }
+#else
+  for (int d = 0; d < cdim; d++) {
+    cuts[d] = 1;
+  }
+#endif  
+    
+  // Construct communicator for use in app.
+  struct gkyl_comm *comm;
+#ifdef GKYL_HAVE_MPI
+  if (app_args.use_gpu && app_args.use_mpi) {
+#ifdef GKYL_HAVE_NCCL
+    comm = gkyl_nccl_comm_new( &(struct gkyl_nccl_comm_inp) {
+        .mpi_comm = MPI_COMM_WORLD,
+      }
+    );
+#else
+    printf(" Using -g and -M together requires NCCL.\n");
+    assert(0 == 1);
+#endif
+  }
+  else if (app_args.use_mpi) {
+    comm = gkyl_mpi_comm_new( &(struct gkyl_mpi_comm_inp) {
+        .mpi_comm = MPI_COMM_WORLD,
+      }
+    );
+  }
+  else {
+    comm = gkyl_null_comm_inew( &(struct gkyl_null_comm_inp) {
+        .use_gpu = app_args.use_gpu
+      }
+    );
+  }
+#else
+  comm = gkyl_null_comm_inew( &(struct gkyl_null_comm_inp) {
+      .use_gpu = app_args.use_gpu
+    }
+  );
+#endif
+
+  int my_rank;
+  gkyl_comm_get_rank(comm, &my_rank);
+  int comm_size;
+  gkyl_comm_get_size(comm, &comm_size);
+
+  int ncuts = 1;
+  for (int d = 0; d < cdim; d++) {
+    ncuts *= cuts[d];
+  }
+
+  if (ncuts != comm_size) {
+    if (my_rank == 0) {
+      fprintf(stderr, "*** Number of ranks, %d, does not match total cuts, %d!\n", comm_size, ncuts);
+    }
+    goto mpifinalize;
+  }
+
+  // Neutral species.
   struct gkyl_vlasov_species neut = {
     .name = "neut",
     .model_id = GKYL_MODEL_CANONICAL_PB,
     .charge = ctx.charge, .mass = ctx.mass,
-    .lower = { -6.0*ctx.vt, -6.0*ctx.vt},
-    .upper = { 6.0*ctx.vt, 6.0*ctx.vt},
-    .cells = { ctx.Nv, ctx.Nv },
-    .hamil = hamil,
-    .h_ij_inv = h_ij_inv,
-    .det_h = det_h,
+    .lower = { -ctx.vtheta_max - ctx.V_theta_drift_l, -1.5*ctx.vphi_max + 1.0 },
+    .upper = { ctx.vtheta_max + ctx.V_theta_drift_l, ctx.vphi_max + 1.0 },
+    .cells = { NVTHETA, NVPHI },
+
+    .hamil = evalHamiltonian,
     .hamil_ctx = &ctx,
+    .h_ij = evalMetric,
+    .h_ij_ctx = &ctx,
+    .h_ij_inv = evalInvMetric,
     .h_ij_inv_ctx = &ctx,
+    .det_h = evalMetricDet,
     .det_h_ctx = &ctx,
 
-    // Reflective boundary condition
-    .bcx = {
-      .lower = { .type = GKYL_SPECIES_REFLECT },
-      .upper = { .type = GKYL_SPECIES_REFLECT },
-    },
+    // Can-pb specific flows for rotating cases
+    .use_extended_hamil_def = true,
+    .background_flows = evalFlows,
+    .background_flows_ctx = &ctx,
+    .effective_potential = evalEffectivePot,
+    .effective_potential_ctx = &ctx,
 
     .num_init = 1, 
     .projection[0] = {
       .proj_id = GKYL_PROJ_VLASOV_LTE,
       .density = evalDensityInit,
       .ctx_density = &ctx,
-      .V_drift = evalVDriftInit,
-      .ctx_V_drift = &ctx,
       .temp = evalTempInit,
       .ctx_temp = &ctx,
-      .correct_all_moms = true, 
+      .V_drift = evalVDriftInit,
+      .ctx_V_drift = &ctx,
+      .correct_all_moms = false,
+      .iter_eps = 0,
+      .max_iter = 0,
+      .use_last_converged = false,
     },
+    
+    // .collisions =  {
+    //   .collision_id = GKYL_BGK_COLLISIONS,
+    //   .self_nu = evalNu,
+    //   .ctx = &ctx,
+    //   .has_implicit_coll_scheme = true,
+    // },
 
-    .collisions =  {
-      .collision_id = GKYL_BGK_COLLISIONS,
+    // .correct = {
+    //   .correct_all_moms = true,
+    //   .iter_eps = 1.0e-12,
+    //   .max_iter = 100,
+    //   .use_last_converged = false,
+    // .output_f_lte = true,
+    // },
 
-      .ctx = &ctx,
-      .self_nu = evalNu,
-      .has_implicit_coll_scheme = true,
-      .correct_all_moms = true, 
+    .bcx = {
+      .lower = { .type = GKYL_SPECIES_REFLECT, },
+      .upper = { .type = GKYL_SPECIES_REFLECT, },
     },
-
-    .num_diag_moments = 4,
-    .diag_moments = { "M0", "M1i", "LTEMoments", "MEnergy" },
+    
+    .num_diag_moments = 1,
+    .diag_moments = { GKYL_F_MOMENT_LTE },
   };
 
-  // VM app
-  struct gkyl_vm vm = {
-    .name = "can_pb_bgk_surf_annulus_sodshock_flat_1x2v_p2",
+  // Vlasov-Maxwell app.
+  struct gkyl_vm app_inp = {
+   .name = "rt_can_pb_rot_surf_sphere_coriolis_2x2v_p2",
 
-    .cdim = 1, .vdim = 2,
-    .lower = { ctx.Rmin },
-    .upper = { ctx.Rmax },
-    .cells = { NR },
-    .poly_order = ctx.poly_order,
-    .basis_type = app_args.basis_type,
+   .cdim = 2, .vdim = 2, 
+   .lower = { ctx.pi / 2.0, 0.0 },
+   .upper = { (ctx.pi / 2.0) + ctx.Ltheta , ctx.Lphi },
+   .cells = { NTHETA, NPHI },
 
-    .num_species = 1,
-    .species = { neut },
-    .skip_field = true,
+   .poly_order = ctx.poly_order,
+   .basis_type = app_args.basis_type,
+   .cfl_frac = ctx.cfl_frac,
 
-    .parallelism = {
+   .num_periodic_dir = 1,
+   .periodic_dirs = { 1 },
+
+   .num_species = 1,
+   .species = { neut },
+
+   .skip_field = true,
+
+   .parallelism = {
       .use_gpu = app_args.use_gpu,
+      .cuts = { app_args.cuts[0], app_args.cuts[1] },
+      .comm = comm,
     },
   };
 
-  // create app object
-  gkyl_vlasov_app *app = gkyl_vlasov_app_new(&vm);
+  // Create app object.
+  gkyl_vlasov_app *app = gkyl_vlasov_app_new(&app_inp);
 
-  // start, end and initial time-step
-  double tcurr = 0.0, tend = ctx.t_end;
-  double dt = tend-tcurr;
-  int nframe = ctx.num_frames;
-  struct gkyl_tm_trigger io_trig = { .dt = tend/nframe };
+  // Initial and final simulation times.
+  double t_curr = 0.0, t_end = ctx.t_end;
 
-  // initialize simulation
-  gkyl_vlasov_app_apply_ic(app, tcurr);
+  // Initialize simulation.
+  int frame_curr = 0;
+  if (app_args.is_restart) {
+    struct gkyl_app_restart_status status = gkyl_vlasov_app_read_from_frame(app, app_args.restart_frame);
 
-  // Write the inital timestep
-  write_data(&io_trig, app, tcurr);
+    if (status.io_status != GKYL_ARRAY_RIO_SUCCESS) {
+      gkyl_vlasov_app_cout(app, stderr, "*** Failed to read restart file! (%s)\n", gkyl_array_rio_status_msg(status.io_status));
+      goto freeresources;
+    }
 
-  long step = 1, num_steps = app_args.num_steps;
-  while ((tcurr < tend) && (step <= num_steps)) {
-    printf("Taking time-step at t = %g ...", tcurr);
+    frame_curr = status.frame;
+    t_curr = status.stime;
+
+    gkyl_vlasov_app_cout(app, stdout, "Restarting from frame %d", frame_curr);
+    gkyl_vlasov_app_cout(app, stdout, " at time = %g\n", t_curr);
+  }
+  else {
+    gkyl_vlasov_app_apply_ic(app, t_curr);
+  }
+
+  // Create trigger for field energy.
+  int field_energy_calcs = ctx.field_energy_calcs;
+  struct gkyl_tm_trigger fe_trig = { .dt = t_end / field_energy_calcs, .tcurr = t_curr, .curr = frame_curr };
+
+  calc_field_energy(&fe_trig, app, t_curr, false);
+
+  // Create trigger for integrated moments.
+  int integrated_mom_calcs = ctx.integrated_mom_calcs;
+  struct gkyl_tm_trigger im_trig = { .dt = t_end / integrated_mom_calcs, .tcurr = t_curr, .curr = frame_curr };
+
+  calc_integrated_mom(&im_trig, app, t_curr, false);
+
+  // Create trigger for integrated L2 norm of the distribution function.
+  int integrated_L2_f_calcs = ctx.integrated_L2_f_calcs;
+  struct gkyl_tm_trigger l2f_trig = { .dt = t_end / integrated_L2_f_calcs, .tcurr = t_curr, .curr = frame_curr };
+
+  calc_integrated_L2_f(&l2f_trig, app, t_curr, false);
+
+  // Create trigger for IO.
+  int num_frames = ctx.num_frames;
+  struct gkyl_tm_trigger io_trig = { .dt = t_end / num_frames, .tcurr = t_curr, .curr = frame_curr };
+
+  write_data(&io_trig, app, t_curr, false);
+
+  // Compute initial guess of maximum stable time-step.
+  double dt = t_end - t_curr;
+
+  // Initialize small time-step check.
+  double dt_init = -1.0, dt_failure_tol = ctx.dt_failure_tol;
+  int num_failures = 0, num_failures_max = ctx.num_failures_max;
+
+  long step = 1;
+  while ((t_curr < t_end) && (step <= app_args.num_steps)) {
+    gkyl_vlasov_app_cout(app, stdout, "Taking time-step %ld at t = %g ...", step, t_curr);
     struct gkyl_update_status status = gkyl_vlasov_update(app, dt);
-    printf(" dt = %g\n", status.dt_actual);
-    gkyl_vlasov_app_calc_integrated_mom(app, tcurr);
+    gkyl_vlasov_app_cout(app, stdout, " dt = %g\n", status.dt_actual);
     
     if (!status.success) {
-      printf("** Update method failed! Aborting simulation ....\n");
+      gkyl_vlasov_app_cout(app, stdout, "** Update method failed! Aborting simulation ....\n");
       break;
     }
-    tcurr += status.dt_actual;
+
+    t_curr += status.dt_actual;
     dt = status.dt_suggested;
-    write_data(&io_trig, app, tcurr);
-    
+
+    calc_field_energy(&fe_trig, app, t_curr, false);
+    calc_integrated_mom(&im_trig, app, t_curr, false);
+    calc_integrated_L2_f(&l2f_trig, app, t_curr, false);
+    write_data(&io_trig, app, t_curr, false);
+
+    if (dt_init < 0.0) {
+      dt_init = status.dt_actual;
+    }
+    else if (status.dt_actual < dt_failure_tol * dt_init) {
+      num_failures += 1;
+
+      gkyl_vlasov_app_cout(app, stdout, "WARNING: Time-step dt = %g", status.dt_actual);
+      gkyl_vlasov_app_cout(app, stdout, " is below %g*dt_init ...", dt_failure_tol);
+      gkyl_vlasov_app_cout(app, stdout, " num_failures = %d\n", num_failures);
+      if (num_failures >= num_failures_max) {
+        gkyl_vlasov_app_cout(app, stdout, "ERROR: Time-step was below %g*dt_init ", dt_failure_tol);
+        gkyl_vlasov_app_cout(app, stdout, "%d consecutive times. Aborting simulation ....\n", num_failures_max);
+
+        calc_field_energy(&fe_trig, app, t_curr, true);
+        calc_integrated_mom(&im_trig, app, t_curr, true);
+        calc_integrated_L2_f(&l2f_trig, app, t_curr, true);
+        write_data(&io_trig, app, t_curr, true);
+
+        break;
+      }
+    }
+    else {
+      num_failures = 0;
+    }
+
     step += 1;
   }
+
+  calc_field_energy(&fe_trig, app, t_curr, false);
+  calc_integrated_mom(&im_trig, app, t_curr, false);
+  calc_integrated_L2_f(&l2f_trig, app, t_curr, false);
+  write_data(&io_trig, app, t_curr, false);
   gkyl_vlasov_app_stat_write(app);
 
-  // fetch simulation statistics
   struct gkyl_vlasov_stat stat = gkyl_vlasov_app_stat(app);
 
-  // simulation complete, free app
+  gkyl_vlasov_app_cout(app, stdout, "\n");
+  gkyl_vlasov_app_cout(app, stdout, "Number of update calls %ld\n", stat.nup);
+  gkyl_vlasov_app_cout(app, stdout, "Number of forward-Euler calls %ld\n", stat.nfeuler);
+  gkyl_vlasov_app_cout(app, stdout, "Number of RK stage-2 failures %ld\n", stat.nstage_2_fail);
+  if (stat.nstage_2_fail > 0) {
+    gkyl_vlasov_app_cout(app, stdout, "  Max rel dt diff for RK stage-2 failures %g\n", stat.stage_2_dt_diff[1]);
+    gkyl_vlasov_app_cout(app, stdout, "  Min rel dt diff for RK stage-2 failures %g\n", stat.stage_2_dt_diff[0]);
+  }  
+  gkyl_vlasov_app_cout(app, stdout, "Number of RK stage-3 failures %ld\n", stat.nstage_3_fail);
+  gkyl_vlasov_app_cout(app, stdout, "Species RHS calc took %g secs\n", stat.species_rhs_tm);
+  gkyl_vlasov_app_cout(app, stdout, "Species collisions RHS calc took %g secs\n", stat.species_coll_tm);
+  gkyl_vlasov_app_cout(app, stdout, "Field RHS calc took %g secs\n", stat.field_rhs_tm);
+  gkyl_vlasov_app_cout(app, stdout, "Species collisional moments took %g secs\n", stat.species_coll_mom_tm);
+  gkyl_vlasov_app_cout(app, stdout, "Total updates took %g secs\n", stat.total_tm);
+
+  gkyl_vlasov_app_cout(app, stdout, "Number of write calls %ld\n", stat.n_io);
+  double io_tm =  stat.field_io_tm + stat.species_io_tm + stat.field_diag_io_tm + stat.species_diag_io_tm;
+  gkyl_vlasov_app_cout(app, stdout, "IO time took %g secs \n", io_tm);
+
+freeresources:
+  // Free resources after simulation completion.
+  gkyl_comm_release(comm);
   gkyl_vlasov_app_release(app);
 
-  printf("\n");
-  printf("Number of update calls %ld\n", stat.nup);
-  printf("Number of forward-Euler calls %ld\n", stat.nfeuler);
-  printf("Number of RK stage-2 failures %ld\n", stat.nstage_2_fail);
-  if (stat.nstage_2_fail > 0) {
-    printf("Max rel dt diff for RK stage-2 failures %g\n", stat.stage_2_dt_diff[1]);
-    printf("Min rel dt diff for RK stage-2 failures %g\n", stat.stage_2_dt_diff[0]);
-  }  
-  printf("Number of RK stage-3 failures %ld\n", stat.nstage_3_fail);
-  printf("Species RHS calc took %g secs\n", stat.species_rhs_tm);
-  printf("Updates took %g secs\n", stat.total_tm);
-  
+mpifinalize:
+#ifdef GKYL_HAVE_MPI
+  if (app_args.use_mpi) {
+    MPI_Finalize();
+  }
+#endif
+
   return 0;
 }
-

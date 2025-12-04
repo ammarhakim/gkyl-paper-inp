@@ -90,11 +90,11 @@ create_ctx(void)
   double nu = 15000.0; // Collision frequency.
 
   // Simulation parameters.
-  int Ntheta = 64; // Cell count (configuration space: polar angular direction).
-  int Nphi = 64; // Cell count (configuration space: azimuthal angular direction).
+  int Ntheta = 128; // Cell count (configuration space: polar angular direction).
+  int Nphi = 128; // Cell count (configuration space: azimuthal angular direction).
   int Nvtheta = 12; // Cell count (velocity space: polar angular direction).
   int Nvphi = 12; // Cell count (velocity space: azimuthal angular direction).
-  double Ltheta = pi / 2.0; // Domain size (configuration space: polar angular direction).
+  double Ltheta = 6.0 * pi / 8.0; // Domain size (configuration space: polar angular direction).
   double Lphi = 2.0 * pi; // Domain size (configuration space: azimuthal angular direction).
   double vtheta_max = 8.0 * vt; // Domain boundary (velocity space: polar angular direction).
   double vphi_max = 8.0 * vt; // Domain boundary (velocity space: azimuthal angular direction).
@@ -102,7 +102,7 @@ create_ctx(void)
   double cfl_frac = 1.0; // CFL coefficient.
 
   double t_end = 10.0; // Final simulation time.
-  int num_frames = 1; // Number of output frames.
+  int num_frames = 100; // Number of output frames.
   int field_energy_calcs = INT_MAX; // Number of times to calculate field energy.
   int integrated_mom_calcs = INT_MAX; // Number of times to calculate integrated moments.
   int integrated_L2_f_calcs = INT_MAX; // Number of times to calculate integrated L2 norm of distribution function.
@@ -341,8 +341,6 @@ write_data(struct gkyl_tm_trigger* iot, gkyl_vlasov_app* app, double t_curr, boo
     gkyl_vlasov_app_write_field_energy(app);
     gkyl_vlasov_app_write_integrated_mom(app);
     gkyl_vlasov_app_write_integrated_L2_f(app);
-
-    gkyl_vlasov_app_calc_mom(app);
     gkyl_vlasov_app_write_mom(app, t_curr, frame);
   }
 }
@@ -487,7 +485,6 @@ main(int argc, char **argv)
     .h_ij_inv_ctx = &ctx,
     .det_h = evalMetricDet,
     .det_h_ctx = &ctx,
-    .output_f_lte = true,
 
     .num_init = 1, 
     .projection[0] = {
@@ -503,15 +500,20 @@ main(int argc, char **argv)
       .max_iter = 0,
       .use_last_converged = false,
     },
+    
     .collisions =  {
       .collision_id = GKYL_BGK_COLLISIONS,
       .self_nu = evalNu,
       .ctx = &ctx,
       .has_implicit_coll_scheme = true,
+    },
+
+    .correct = {
       .correct_all_moms = true,
-      .iter_eps = 0.0,
-      .max_iter = 0,
+      .iter_eps = 1.0e-12,
+      .max_iter = 100,
       .use_last_converged = false,
+      .output_f_lte = true,
     },
 
     .bcx = {
@@ -520,16 +522,16 @@ main(int argc, char **argv)
     },
     
     .num_diag_moments = 3,
-    .diag_moments = { "M0", "M1i", "LTEMoments" },
+    .diag_moments = { GKYL_F_MOMENT_M0, GKYL_F_MOMENT_M1, GKYL_F_MOMENT_LTE },
   };
 
   // Vlasov-Maxwell app.
   struct gkyl_vm app_inp = {
-   .name = "can_pb_bgk_surf_sphere_khi_im_2x2v_p2",
+   .name = "rt_fig2_surf_sphere_khi",
 
    .cdim = 2, .vdim = 2, 
-   .lower = { ctx.pi / 4.0, 0.0 },
-   .upper = { (ctx.pi / 4.0) + ctx.Ltheta, ctx.Lphi },
+   .lower = { ctx.pi / 8.0, 0.0 },
+   .upper = { (ctx.pi / 8.0) + ctx.Ltheta, ctx.Lphi },
    .cells = { NTHETA, NPHI },
 
    .poly_order = ctx.poly_order,
@@ -679,7 +681,8 @@ main(int argc, char **argv)
   gkyl_vlasov_app_cout(app, stdout, "Total updates took %g secs\n", stat.total_tm);
 
   gkyl_vlasov_app_cout(app, stdout, "Number of write calls %ld\n", stat.n_io);
-  gkyl_vlasov_app_cout(app, stdout, "IO time took %g secs \n", stat.io_tm);
+  double io_tm =  stat.field_io_tm + stat.species_io_tm + stat.field_diag_io_tm + stat.species_diag_io_tm;
+  gkyl_vlasov_app_cout(app, stdout, "IO time took %g secs \n", io_tm);
 
 freeresources:
   // Free resources after simulation completion.
@@ -695,4 +698,3 @@ mpifinalize:
 
   return 0;
 }
-
