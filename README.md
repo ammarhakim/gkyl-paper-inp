@@ -17,8 +17,8 @@ The folders in this repository correspond to the following publications:
 - **2024_ApJ_RayleighTaylor**: J. Rodman, J. Juno, and B. Srinivasan. "The Effect of Spatially Varying Collision Frequency on the Development of the Rayleigh–Taylor Instability." Astrophysical Journal, **965**, 173.
 - **2024_ApJ_LAPDReflection**: S. Bose, J. TenBarge, et al. "Experimental Study of Alfvén Wave Reflection from an Alfvén-speed Gradient Relevant to the Solar Coronal Holes." Astrophysical Journal, **971**, 72.
 - **2024_PSST_ModelSEE**: K. Bradshaw and B. Srinivasan. "Energy-dependent implementation of secondary electron emission models in continuum kinetic sheath simulations". Submitted to Plasma Sources Science and Technology
-- **2023_PoP_Reconnection**: J. TenBarge, et al. "Electron Energization in Reconnection: Eulerian versus Lagrangian Perspectives". Phys. Plasmas 31, 022901 (2024) https://doi.org/10.1063/5.0184710
-- **2023_ESS_Reconstruction**: T. Broeren, et al. "Multi-Spacecraft Magnetic Field Reconstructions: A Cross-Scale Comparison of Methods". Submitted to Earth and Space Science
+- **2024_ESS_Reconstruction**: T. Broeren, et al. "Multi-Spacecraft Magnetic Field Reconstructions: A Cross-Scale Comparison of Methods". Earth and Space Science Volume 11, Issue 3, (2024) https://doi.org/10.1029/2023EA003369
+- **2024_PoP_Reconnection**: J. TenBarge, et al. "Electron Energization in Reconnection: Eulerian versus Lagrangian Perspectives". Phys. Plasmas 31, 022901 (2024) https://doi.org/10.1063/5.0184710
 - **2023_PRX_iat**: Z. Liu, et al. "A Two-dimensional Numerical Study of
   Ion-Acoustic Turbulence". Submitted to Physical Review X.
 - **2023_PoP_neutral_blobs**: T. N. Bernard, et al. "Effect of neutral
