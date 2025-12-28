@@ -10,7 +10,8 @@ The folders in this repository correspond to the following publications:
 - **2025_NF_tcvadaptsrc**: A. C. D. Hoffmann, T. N. Bernard, M. Francisquez, G. W. Hammett, A. Hakim, J. Boedo, R. Rizkallah, and C. K. Tsui, "Towards fully predictive gyrokinetic full-f simulations". Submitted to Nuclear Fusion.
 - **2025_JGR_JET-PLUME**: C. R. Brown, G. G. Howes, K. G. Klein, and J. M. TenBarge, "Phase-Space Energy Transfer of Wave-Particle Interactions using the Field-Particle Correlation Technique and Linear Plasma Theory with JET-PLUME". Submitted to JGR
 - **2025_NF_Radiation**: J. Roeltgen, J. Juno, M. Kotschenreuther, T. Bernard, A. Shukla, M. Francisquez, A. Hakim, G. Hammett, D. Power, D. Hatch, "A Kinetic Line-Driven Radiation Operator and Its Application to Gyrokinetics". Submitted to Nuclear Fusion.
-- **2025_JPP_MJ**: G. Johnson, A. Hakim, J. Juno, "A Moment-Conserving Discontinuous Galerkin Representation of the Relativistic Maxwellian Distribution". Submited to the Journal of Plasma Physics.
+- **2025_JPP_MJ**: G. Johnson, A. Hakim, J. Juno, "A Moment-Conserving Discontinuous Galerkin Representation of the Relativistic Maxwellian Distribution." Journal of Plasma Physics 91.5 (2025): E130.
+doi:10.1017/S0022377825100718
 - **2024_PoP_KPS**: S. A. Conley, J. Juno, J. M. TenBarge, M. H. Barbhuiya, P. A. Cassak, G. G. Howes, E. Lichko. "The kinetic analogue of the pressure-strain interaction." Physics of Plasmas, **31**, 122117. 
 - **2024_ApJ_Firehose**: J. Walters, K. G. Klein, E. Lichko, J. Juno, J. M. TenBarge. "Electron Influence on the Parallel Proton Firehose Instability in 10-Moment, Multi-Fluid Simulations."  Astrophysical Journal, **975**, 290. 
 - **2024_NF_ImpTransport**: Zamperini, S. A., Bernard, T. A., Rudakov, D. L. & Boedo, J. A. "Turbulent drifts of impurity ions as an explanation for anomalous radial transport in the far-SOL of DIII-D". Nucl. Fusion 64, 074002 (2024) https://dx.doi.org/10.1088/1741-4326/ad4c78
