@@ -7,6 +7,8 @@ This repository contains input files and other supplimentary material from [Gkey
 **Note to authors:** please add another README.md file in each folder describing the input files (e.g. see 2020_JPP_VmLBO).
 
 The folders in this repository correspond to the following publications:
+- **2026_PoP_Skolar_Invited**: C. R. Skolar and B. Srinivasan, "Effects of parallel magnetic fields on sheaths near biased electrodes in a highly collisional Z-pinch plasma". Submitted to Physics of Plasmas
+- **2025_PoP_IIEE_Sheaths**: C. R. Skolar, K. Bradshaw, M. Francisquez, L. Murillo, V. Krishna Kumar, and B. Srinivasan, "General kinetic ion-induced electron emission model for metallic walls applied to biased Z-pinch electrodes". Phys. Plasmas 1 August 2025; 32 (8): 082306. https://doi.org/10.1063/5.0261942
 - **2025_NF_tcvadaptsrc**: A. C. D. Hoffmann, T. N. Bernard, M. Francisquez, G. W. Hammett, A. Hakim, J. Boedo, R. Rizkallah, and C. K. Tsui, "Towards fully predictive gyrokinetic full-f simulations". Submitted to Nuclear Fusion.
 - **2025_JGR_JET-PLUME**: C. R. Brown, G. G. Howes, K. G. Klein, and J. M. TenBarge, "Phase-Space Energy Transfer of Wave-Particle Interactions using the Field-Particle Correlation Technique and Linear Plasma Theory with JET-PLUME". Submitted to JGR
 - **2025_NF_Radiation**: J. Roeltgen, J. Juno, M. Kotschenreuther, T. Bernard, A. Shukla, M. Francisquez, A. Hakim, G. Hammett, D. Power, D. Hatch, "A Kinetic Line-Driven Radiation Operator and Its Application to Gyrokinetics". Submitted to Nuclear Fusion.
@@ -31,7 +33,7 @@ doi:10.1017/S0022377825100718
 - **2023_jets**: P. Cagas, et al. "An investigation of shock formation versus
   shock mitigation of colliding plasma jets". Phys. Plasmas 30, 053903 (2023).
 - **2023_ApJ_ObliqueShock**: J. Juno, et al. "Phase-space Energization of Ions in Oblique Shocks." Astrophysical Journal 944.15 (2023).
-- **2022_PoP_BiasedWallSheaths**: C. R. Skolar, et al. "Continuum kinetic investigation of the impact of bias potentials in the current saturation regime on sheath formation". Physics of Plasmas 30, 012504 (2023)
+- **2022_PoP_BiasedWallSheaths**: C. R. Skolar, K. Bradshaw, J. Juno, and B. Srinivasan, "Continuum kinetic investigation of the impact of bias potentials in the current saturation regime on sheath formation". Phys. Plasmas 1 January 2023; 30 (1): 012504. https://doi.org/10.1063/5.0134656
 - **2022_PoP_neutrals**: T. N. Bernard, et al. "Kinetic modeling of neutral
   transport for a continuum gyrokinetic code". Phys. Plasmas 29, 052501 (2022).
 - **2022_PoP_EMGK_broadening**: N. R. Mandell, et al. "Turbulent
