@@ -1,8 +1,45 @@
-gridstep2x:
+List of Input Files Used in the Paper:
+
+gridstep2x.c:
    - An input file that just generates a STEP grid for plotting (no full simulation setup)
+   - Used for fig 1a, 2b, and 3.
 
-rt_gk_step9:
-   - STEP simulation plotted in the paper in section 7
-
-gridmbasdex_2x:
+gridmbasdex_2x.c:
    - An input file that just generates an asdex grid for plotting (no full simulation setup)
+   - Used for fig 1b and 4
+
+griddn.c:
+   - Used in section 7.1 to test convergence of the volume.
+   - Using line 74 includes the X-point, replacing it with line 75 excludes the X-point.
+
+awaybump_grad_mod_succesfulconvergence_physbcs_poissonsn.c:
+   - Section 7.2 poisson test away from X-point
+
+uniform_grad_mod_succesful_convergence_onebumpxpt_physicalbcs_poissonsn.c
+   - Section 7.2 poisson test on X-point
+
+rt_gk_step9.c:
+   - STEP simulation plotted in the paper in section 7
+   - Update: This input file is with no drifts and is used for the arxiv version of the paper. 
+     In the revised version we include drifts and use step28.c
+
+
+unit_nearxpt_gaussian_zhat_succesful_convergence_advectbump.c
+   - Section 7.3 advection of gaussian blob near X-point
+
+step28.c:
+   - Section 7.4 double nul multiblock step simulation input file used for particle conservation test.
+
+
+
+
+List of Code Versions Used in the Paper:
+The poisson solver and volume tests in sections 7.1 and section 7.2  as well as 
+the grids shown in section 4 and 6 also use this version of Gkeyll:
+https://github.com/ammarhakim/gkeyll/tree/04e08ab30b272635827835a79a8f0e8df3c4c474
+
+The advection tests in section 7.3 use this version of Gkeyll:
+https://github.com/ammarhakim/gkeyll/tree/74e8ab078dcce7897560d430328f26bc8c4eb4cd
+
+The particle conservation test in section 7.4 uses the following version of gkeyll:
+https://github.com/ammarhakim/gkeyll/tree/ab5cd5c0c0707da61fc44af8f091fac51042f5c6
