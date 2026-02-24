@@ -1,0 +1,13 @@
+figure.facecolor : white
+lines.linewidth : 1
+font.size : 18
+axes.labelsize : large
+axes.titlesize : 18
+image.interpolation : none
+image.cmap : inferno
+image.origin : lower
+grid.linewidth : 1.5
+grid.linestyle : :
+text.usetex : true
+font.family : 'sans-serif'
+font.sans-serif : ['Helvetica']
