@@ -1,0 +1,1 @@
+squeue -u mr1884 -n poa-bem-R-3,poa-bem-R-5,poa-bem-R-10,poa-bem-R-15,poa-bem-R-22 -h -o %i | xargs scancel

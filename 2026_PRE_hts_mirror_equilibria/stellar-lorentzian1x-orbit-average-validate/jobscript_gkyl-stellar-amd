@@ -1,0 +1,67 @@
+#!/bin/bash -l
+### This job script is for the 2 GPU node part of stellar-amd
+
+#.Declare a name for this job, preferably with 16 or fewer characters.
+#SBATCH -J lorenzPOA-validate
+
+#.Request the queue (enter the possible names, if omitted, default is the default)
+#.this job is going to use the default
+#SBATCH -q pppl-short
+
+#. Stellar AMD Rome nodes have 128 cords, 2 GPUs, 550 GB RAM
+#SBATCH -N 1
+#SBATCH --ntasks-per-node 2
+#SBATCH --mem=200000
+
+#.Specify GPU needs:
+#SBATCH --gres=gpu:2
+
+#.Request wall time
+#SBATCH -t 24:00:00
+
+num_gpu=2
+
+module load nvhpc/25.5
+module load cudatoolkit/12.9
+module load openmpi/cuda-12.9/nvhpc-25.5/4.1.8
+module load openblas/0.3.x
+
+# mv misc/* .
+# mv Distributions/* .
+# mv Geometry/* .
+
+max_number=0
+file_prefix="gk_lorentzian_mirror-ion_"
+file_extension="[0-9]*.gkyl"
+matching_files=$(ls $file_prefix$file_extension)
+for file in $matching_files; do
+  # # Extract the number between the prefix and suffix
+  number=$(echo "$file" | sed "s|$file_prefix||; s|\.gkyl||")
+  # If the number is greater than the current max_number, update max_number and max_file
+  if [ "$number" -gt "$max_number" ]; then
+    max_number="$number"
+  fi
+done
+echo "Max number is $max_number"
+
+if [ "$max_number" -eq 0 ]; then
+  echo "No matching files found. Starting from the begining"
+  if [ "$num_gpu" -eq 1 ]; then
+    echo "./sim -g"
+    ./sim -g
+  else
+    echo "srun -u -n $num_gpu ./sim -g -M -c $num_gpu"
+    srun -u -n $num_gpu ./sim -g -M -c $num_gpu
+  fi
+else
+  echo "Resuming from file $max_number"
+  if [ "$num_gpu" -eq 1 ]; then
+    echo "./sim -g -r $max_number"
+    ./sim -g -r $max_number
+  else
+    echo "srun -u -n $num_gpu ./sim -g -M -c $num_gpu -r $max_number"
+    srun -u -n $num_gpu ./sim -g -M -c $num_gpu -r $max_number
+  fi
+fi
+
+# bash organize.sh
