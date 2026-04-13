@@ -7,7 +7,11 @@ This repository contains input files and other supplimentary material from [Gkey
 **Note to authors:** please add another README.md file in each folder describing the input files (e.g. see 2020_JPP_VmLBO).
 
 The folders in this repository correspond to the following publications:
-- **2026_PoP_Skolar_Invited**: C. R. Skolar and B. Srinivasan, "Effects of parallel magnetic fields on sheaths near biased electrodes in a highly collisional Z-pinch plasma". Submitted to Physics of Plasmas
+- **2026_PRX_tcv_miller_scan**: A. C. D. Hoffmann, M. Francisquez, T. N. Bernard, G. W. Hammett, A. Hakim. "High-throughput full-f gyrokinetics of the tokamak boundary". Submitted to PRX.
+- **2026_PRE_hts_mirror_equilibria**: M. Rosen, M. Francisquez, A. Hakim, G. W. Hammett. "Gyrokinetic equilibria of high temperature superconducting magnetic mirrors". Submitted to PRE.
+- **2026_PoP_Skolar_Invited**: C. R. Skolar and B. Srinivasan, "Effects of parallel magnetic fields on sheaths near biased electrodes in a highly collisional Z-pinch plasma". Submitted to Physics of Plasmas.
+- **2025_JPP_Xpt**: A. Shukla, A. Hakim, J. Juno, G. W. Hammett,  M. Francisquez. "Constructing Field Aligned Coordinate Systems for Gyrokinetic Simulations of Tokamaks in X-point Geometries". Submitted to JPP.
+- **2025_JCP_nonuniformV**: M. Francisquez, P. Cagas, A. Shukla, J. Juno, G. W. Hammett. "Conservative velocity mappings for discontinuous Galerkin kinetics". JCP 558, 114852 (2026).
 - **2025_PoP_IIEE_Sheaths**: C. R. Skolar, K. Bradshaw, M. Francisquez, L. Murillo, V. Krishna Kumar, and B. Srinivasan, "General kinetic ion-induced electron emission model for metallic walls applied to biased Z-pinch electrodes". Phys. Plasmas 1 August 2025; 32 (8): 082306. https://doi.org/10.1063/5.0261942
 - **2025_NF_tcvadaptsrc**: A. C. D. Hoffmann, T. N. Bernard, M. Francisquez, G. W. Hammett, A. Hakim, J. Boedo, R. Rizkallah, and C. K. Tsui, "Towards fully predictive gyrokinetic full-f simulations". Submitted to Nuclear Fusion.
 - **2025_JGR_JET-PLUME**: C. R. Brown, G. G. Howes, K. G. Klein, and J. M. TenBarge, "Phase-Space Energy Transfer of Wave-Particle Interactions using the Field-Particle Correlation Technique and Linear Plasma Theory with JET-PLUME". Submitted to JGR
