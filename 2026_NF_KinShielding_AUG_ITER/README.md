@@ -8,14 +8,14 @@ Input files used to simulate AUG discharge \#36190 (adapted from https://arxiv.o
 ITER:
 
 - ITER_no_impurities.c: The main-plasma simulation, without impurity argon added.
-- ITER_impurities_static_ion.c: The simulation with impurity argons added, where the electrons and ions are kept static to speed up convergence. NOTE: this script was lost, and attempted to be recreated post facto. Correctness of this script cannot be guaranteed.
+- ITER_impurities_static_ion.c: The simulation with impurity argon added, where the electrons and main ions are kept static to speed up convergence. NOTE: this script was lost, and attempted to be recreated post facto. Correctness of this script cannot be guaranteed.
 - ITER_impurities_static_elc.c: Same as above, except now only the electrons are kept static, and the ions are evolved.
 - ITER_impurities_dynamic_elc.c: The full simulation, with the electrons evolved as well (all physics enabled).
 
 ASDEX:
 
 - ASDEX_no_impurities.c: The main-plasma simulation, without impurity argon added.
-- ASDEX_impurities_static_elc.c: Same as above, except now only the electrons are kept static, and the ions are evolved.
+- ASDEX_impurities_static_elc.c: The simulation with impurity argon added, where the electrons are kept static to speed up convergence
 - ASDEX_impurities_dynamic_elc.c: The full simulation, with the electrons evolved as well (all physics enabled).
 
 # Diffusivity scan
