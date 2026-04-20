@@ -1,6 +1,6 @@
 Input files used to simulate AUG discharge \#36190 (adapted from https://arxiv.org/pdf/2505.10754v3), and ITER SOLPS case \#2292, with a static neutral argon background added to study impurity transport.
 
-The simulations were performed in branch `diffusive\_bcs\_mod` in commit `c8ded37fc`
+The simulations were performed in branch `diffusive_bcs_mod` in commit `c8ded37fc`
 # Base simulations
 
 ### these simulations are run from the output of the previous
