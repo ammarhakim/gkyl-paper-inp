@@ -7,6 +7,8 @@ This repository contains input files and other supplimentary material from [Gkey
 **Note to authors:** please add another README.md file in each folder describing the input files (e.g. see 2020_JPP_VmLBO).
 
 The folders in this repository correspond to the following publications:
+- **2026_NF_KinShielding_AUG_ITER**: S.P. Reinhoudt et al. "The impact of kinetic shielding on divertor impurity
+transport in ASDEX Upgrade and ITER". Paper yet to be written
 - **2026_PRX_tcv_miller_scan**: A. C. D. Hoffmann, M. Francisquez, T. N. Bernard, G. W. Hammett, A. Hakim. "High-throughput full-f gyrokinetics of the tokamak boundary". Submitted to PRX.
 - **2026_PRE_hts_mirror_equilibria**: M. Rosen, M. Francisquez, A. Hakim, G. W. Hammett. "Gyrokinetic equilibria of high temperature superconducting magnetic mirrors". Submitted to PRE.
 - **2026_PoP_Skolar_Invited**: C. R. Skolar and B. Srinivasan, "Effects of parallel magnetic fields on sheaths near biased electrodes in a highly collisional Z-pinch plasma". Submitted to Physics of Plasmas.
