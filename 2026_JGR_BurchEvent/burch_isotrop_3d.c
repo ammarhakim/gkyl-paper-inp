@@ -1,4 +1,4 @@
-// Burch et al. magnetic reconnection test, with local closure, for the 10-moment equations.
+// Burch et al. magnetic reconnection test, with pressure-isotropizing closure, for the 10-moment equations.
 
 #include <math.h>
 #include <stdio.h>
@@ -19,7 +19,7 @@
 
 #include <rt_arg_parse.h>
 
-struct burch_local_closure_ctx
+struct burch_isotrop_closure_ctx
 {
   // Mathematical constants (dimensionless).
   double pi;
@@ -84,7 +84,7 @@ struct burch_local_closure_ctx
   int num_failures_max; // Maximum allowable number of consecutive small time-steps.
 };
 
-struct burch_local_closure_ctx
+struct burch_isotrop_closure_ctx
 create_ctx(void)
 {
   // Mathematical constants (dimensionless).
@@ -150,7 +150,7 @@ create_ctx(void)
   double dt_failure_tol = 1.0e-4; // Minimum allowable fraction of initial time-step.
   int num_failures_max = 20; // Maximum allowable number of consecutive small time-steps.
   
-  struct burch_local_closure_ctx ctx = {
+  struct burch_isotrop_closure_ctx ctx = {
     .pi = pi,
     .epsilon0 = epsilon0,
     .mu0 = mu0,
@@ -237,7 +237,7 @@ void
 evalElcInit(double t, const double* GKYL_RESTRICT xn, double* GKYL_RESTRICT fout, void* ctx)
 {
   double x = xn[0], y = xn[1], z = xn[2];
-  struct burch_local_closure_ctx *app = ctx;
+  struct burch_isotrop_closure_ctx *app = ctx;
 
   double pi = app -> pi;
 
@@ -328,7 +328,7 @@ void
 evalIonInit(double t, const double* GKYL_RESTRICT xn, double* GKYL_RESTRICT fout, void* ctx)
 {
   double x = xn[0], y = xn[1], z = xn[2];
-  struct burch_local_closure_ctx *app = ctx;
+  struct burch_isotrop_closure_ctx *app = ctx;
 
   double pi = app -> pi;
 
@@ -412,7 +412,7 @@ void
 evalFieldInit(double t, const double* GKYL_RESTRICT xn, double* GKYL_RESTRICT fout, void* ctx)
 {
   double x = xn[0], y = xn[1], z = xn[2];
-  struct burch_local_closure_ctx *app = ctx;
+  struct burch_isotrop_closure_ctx *app = ctx;
 
   double pi = app -> pi;
 
@@ -512,7 +512,7 @@ main(int argc, char **argv)
     gkyl_mem_debug_set(true);
   }
 
-  struct burch_local_closure_ctx ctx = create_ctx(); // Context for initialization functions.
+  struct burch_isotrop_closure_ctx ctx = create_ctx(); // Context for initialization functions.
 
   int NX = APP_ARGS_CHOOSE(app_args.xcells[0], ctx.Nx);
   int NY = APP_ARGS_CHOOSE(app_args.xcells[1], ctx.Ny);

@@ -2,4 +2,4 @@
 Kolter Bradshaw, Ammar Hakim, James Juno, Joshua Pawlak, Jason TenBarge, and Amitava Bhattacharjee
 Submitted to JGR: Space Physics
 
-Input files simulating the 3D Burch event using the gradient and local closure.
+Input files simulating the 3D Burch event using the gradient-based and pressure-isotropizing closures.
